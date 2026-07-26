@@ -1,0 +1,83 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String        @id @default(cuid())
+  name          String?
+  phone         String?
+  email         String        @unique
+  passwordHash  String?
+  googleId      String?       @unique
+  avatarUrl     String?
+  emailVerifiedAt DateTime?
+  walletBalance Int           @default(0)
+  createdAt     DateTime      @default(now())
+  orders        Order[]
+  transactions  Transaction[]
+  resetTokens   PasswordResetToken[]
+  verificationTokens EmailVerificationToken[]
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String // "topup" | "purchase" | "refund"
+  amount    Int
+  reference String   @unique
+  status    String // "pending" | "successful" | "failed"
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  externalOrderId String   @unique
+  server          String
+  country         String
+  countryName     String
+  service         String
+  serviceName     String
+  number          String
+  costBase        Int // what we paid Talktiyu (NGN)
+  costCharged     Int // what we charged the user (NGN, includes markup)
+  smsText         String?
+  status          String // "pending" | "received" | "cancelled" | "expired"
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+}
