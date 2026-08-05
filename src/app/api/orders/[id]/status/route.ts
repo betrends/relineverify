@@ -59,6 +59,17 @@ async function refundAndClose(
   status: "expired" | "cancelled"
 ) {
   return prisma.$transaction(async (tx) => {
+    // Concurrent polls can both read this order as "pending" before either
+    // commits — guard the transition so only the request that actually
+    // flips it away from "pending" gets to issue the refund, otherwise two
+    // overlapping checks could both refund the same charge.
+    const claimed = await tx.order.updateMany({
+      where: { id: order.id, status: "pending" },
+      data: { status },
+    });
+    if (claimed.count === 0) {
+      return tx.order.findUniqueOrThrow({ where: { id: order.id } });
+    }
     await tx.user.update({
       where: { id: order.userId },
       data: { walletBalance: { increment: order.costCharged } },
@@ -72,6 +83,6 @@ async function refundAndClose(
         status: "successful",
       },
     });
-    return tx.order.update({ where: { id: order.id }, data: { status } });
+    return tx.order.findUniqueOrThrow({ where: { id: order.id } });
   });
 }

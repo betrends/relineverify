@@ -8,7 +8,7 @@ import { rateLimitOrNull } from "@/lib/rateLimit";
 const schema = z.object({ email: z.string().email() });
 
 export async function POST(req: NextRequest) {
-  const limited = rateLimitOrNull(req, "forgot-password", 5, 60 * 60 * 1000);
+  const limited = await rateLimitOrNull(req, "forgot-password", 5, 60 * 60 * 1000);
   if (limited) return limited;
 
   const body = await req.json().catch(() => null);

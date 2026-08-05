@@ -1,11 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useWalletBalance } from "@/lib/useWalletBalance";
 import Reveal from "./motion/Reveal";
 import HoverLift from "./motion/HoverLift";
 import AnimatedNumber from "./motion/AnimatedNumber";
 import type { Order } from "./OrderCard";
+import type { GeneratedEmail } from "./EmailCard";
 
 const ACCENT = {
   violet: { iconBg: "bg-violet-50 dark:bg-violet-500/10", icon: "text-violet-600 dark:text-violet-300", chip: "bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-300" },
@@ -13,32 +16,49 @@ const ACCENT = {
   emerald: { iconBg: "bg-emerald-50 dark:bg-emerald-500/10", icon: "text-emerald-600 dark:text-emerald-300", chip: "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-300" },
 } as const;
 
-export default function StatsStrip({ orders }: { orders: Order[] }) {
+export default function StatsStrip({ orders, emails }: { orders: Order[]; emails: GeneratedEmail[] }) {
+  const t = useTranslations("dashboard.stats");
   const { balance } = useWalletBalance();
 
-  const activeCount = useMemo(() => orders.filter((o) => o.status === "pending").length, [orders]);
-  const lifetimeSpend = useMemo(
-    () => orders.filter((o) => o.status === "received").reduce((sum, o) => sum + o.costCharged, 0),
-    [orders]
-  );
+  // "Pending" covers both a fresh email waiting on its first code and one
+  // mid-regenerate waiting on a replacement — both are genuinely in flight,
+  // same as a pending SMS order.
+  const activeCount = useMemo(() => {
+    const activeOrders = orders.filter((o) => o.status === "pending").length;
+    const activeEmails = emails.filter((e) => e.status === "pending").length;
+    return activeOrders + activeEmails;
+  }, [orders, emails]);
+  // Only charges that were actually kept count as spend. Orders: "received"
+  // only — cancelled/expired orders are refunded. Emails never refund once
+  // charged (received, expired, or cancelled all keep the charge), so any
+  // non-pending email counts.
+  const lifetimeSpend = useMemo(() => {
+    const orderSpend = orders.filter((o) => o.status === "received").reduce((sum, o) => sum + o.costCharged, 0);
+    const emailSpend = emails
+      .filter((e) => e.status !== "pending")
+      .reduce((sum, e) => sum + e.costCharged, 0);
+    return orderSpend + emailSpend;
+  }, [orders, emails]);
 
   const stats: {
-    label: string;
+    key: "walletBalance" | "activeOrders" | "totalSpent";
     value: number;
     prefix: string;
     accent: keyof typeof ACCENT;
     icon: React.ReactNode;
     live?: boolean;
+    href?: string;
   }[] = [
     {
-      label: "Wallet Balance",
+      key: "walletBalance",
       value: balance ?? 0,
       prefix: "₦",
       accent: "violet",
       icon: <WalletIcon />,
+      href: "/dashboard/transactions",
     },
     {
-      label: "Active Orders",
+      key: "activeOrders",
       value: activeCount,
       prefix: "",
       accent: "blue",
@@ -46,7 +66,7 @@ export default function StatsStrip({ orders }: { orders: Order[] }) {
       live: activeCount > 0,
     },
     {
-      label: "Total Spent",
+      key: "totalSpent",
       value: lifetimeSpend,
       prefix: "₦",
       accent: "emerald",
@@ -56,9 +76,13 @@ export default function StatsStrip({ orders }: { orders: Order[] }) {
 
   return (
     <div className="grid gap-4 sm:grid-cols-3">
-      {stats.map((s, i) => (
-        <Reveal key={s.label} delay={i * 0.05}>
-          <HoverLift className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-ink-700 dark:bg-ink-900">
+      {stats.map((s, i) => {
+        const card = (
+          <HoverLift
+            className={`flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-ink-700 dark:bg-ink-900 ${
+              s.href ? "cursor-pointer" : ""
+            }`}
+          >
             <div className="flex items-center gap-3">
               <span className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${ACCENT[s.accent].iconBg} ${ACCENT[s.accent].icon}`}>
                 {s.live && (
@@ -67,8 +91,8 @@ export default function StatsStrip({ orders }: { orders: Order[] }) {
                 {s.icon}
               </span>
               <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">{s.label}</p>
-                {balance === null && s.label === "Wallet Balance" ? (
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t(s.key)}</p>
+                {balance === null && s.key === "walletBalance" ? (
                   <p className="text-2xl font-bold text-slate-900 dark:text-paper-100">…</p>
                 ) : (
                   <AnimatedNumber
@@ -85,8 +109,20 @@ export default function StatsStrip({ orders }: { orders: Order[] }) {
               <ChevronRightIcon />
             </span>
           </HoverLift>
-        </Reveal>
-      ))}
+        );
+
+        return (
+          <Reveal key={s.key} delay={i * 0.05}>
+            {s.href ? (
+              <Link href={s.href} className="block focus-ring rounded-2xl">
+                {card}
+              </Link>
+            ) : (
+              card
+            )}
+          </Reveal>
+        );
+      })}
     </div>
   );
 }

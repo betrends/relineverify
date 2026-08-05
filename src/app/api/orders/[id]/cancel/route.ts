@@ -38,6 +38,16 @@ export async function POST(
   }
 
   const updated = await prisma.$transaction(async (tx) => {
+    // Guard against a double-click or two tabs both passing the pending
+    // check above before either commits — only the request that actually
+    // flips the order away from "pending" gets to issue the refund.
+    const claimed = await tx.order.updateMany({
+      where: { id: order.id, status: "pending" },
+      data: { status: "cancelled" },
+    });
+    if (claimed.count === 0) {
+      return tx.order.findUniqueOrThrow({ where: { id: order.id } });
+    }
     await tx.user.update({
       where: { id: order.userId },
       data: { walletBalance: { increment: order.costCharged } },
@@ -51,7 +61,7 @@ export async function POST(
         status: "successful",
       },
     });
-    return tx.order.update({ where: { id: order.id }, data: { status: "cancelled" } });
+    return tx.order.findUniqueOrThrow({ where: { id: order.id } });
   });
 
   return NextResponse.json({ order: updated });

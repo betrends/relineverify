@@ -12,7 +12,7 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const limited = rateLimitOrNull(req, "login", 10, 15 * 60 * 1000);
+  const limited = await rateLimitOrNull(req, "login", 10, 15 * 60 * 1000);
   if (limited) return limited;
 
   const body = await req.json().catch(() => null);

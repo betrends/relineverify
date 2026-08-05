@@ -2,10 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import OtpReadout from "./OtpReadout";
 import ServiceIcon from "./ServiceIcon";
 import MotionButton from "./motion/MotionButton";
 import { refreshWallet } from "@/lib/walletEvents";
+import { extractCode } from "@/lib/extractCode";
+import { useCodeExpiry, formatRemaining } from "@/lib/useCodeExpiry";
+import { playCodeReceivedSound } from "@/lib/notificationSound";
 
 export type Order = {
   id: string;
@@ -20,13 +24,14 @@ export type Order = {
   smsText: string | null;
   status: "pending" | "received" | "cancelled" | "expired";
   createdAt: string;
+  updatedAt: string;
 };
 
-const STATUS_LABEL: Record<Order["status"], string> = {
-  pending: "Pending",
-  received: "Received",
-  cancelled: "Cancelled",
-  expired: "Expired",
+const STATUS_KEY: Record<Order["status"], "statusPending" | "statusReceived" | "statusCancelled" | "statusExpired"> = {
+  pending: "statusPending",
+  received: "statusReceived",
+  cancelled: "statusCancelled",
+  expired: "statusExpired",
 };
 
 const STATUS_BADGE: Record<Order["status"], string> = {
@@ -43,11 +48,15 @@ export default function OrderCard({
   order: Order;
   onChange?: (order: Order) => void;
 }) {
+  const t = useTranslations("dashboard.orderCard");
   const [order, setOrder] = useState(initial);
   const [canCancel, setCanCancel] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [copied, setCopied] = useState<"number" | "code" | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const { expired: codeExpired, remainingMs } = useCodeExpiry(
+    order.status === "received" ? order.updatedAt : undefined
+  );
 
   useEffect(() => setOrder(initial), [initial]);
 
@@ -71,6 +80,9 @@ export default function OrderCard({
       const res = await fetch(`/api/orders/${order.id}/status`, { cache: "no-store" });
       if (!res.ok) return;
       const json = await res.json();
+      if (json.order.status === "received" && json.order.status !== order.status) {
+        playCodeReceivedSound();
+      }
       setOrder(json.order);
       onChange?.(json.order);
     }
@@ -130,7 +142,7 @@ export default function OrderCard({
           {order.status === "pending" && (
             <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulseDot" />
           )}
-          {STATUS_LABEL[order.status]}
+          {t(STATUS_KEY[order.status])}
         </span>
       </div>
 
@@ -150,18 +162,35 @@ export default function OrderCard({
           />
         )}
         {order.status === "received" ? (
-          <>
-            <OtpReadout
-              resolved={extractCode(order.smsText) || order.smsText || ""}
-              length={6}
-              className="text-2xl text-emerald-600 dark:text-mint-400"
-            />
-            <p className="mt-2 text-xs text-slate-500">{order.smsText}</p>
-          </>
+          codeExpired ? (
+            <p className="text-sm text-slate-500">{t("codeExpired")}</p>
+          ) : (
+            (() => {
+              const code = extractCode(order.smsText);
+              return (
+                <>
+                  <OtpReadout
+                    resolved={code || order.smsText || ""}
+                    length={6}
+                    className="text-2xl text-emerald-600 dark:text-mint-400"
+                  />
+                  {/* Only show the raw message when it's distinct from what's already
+                      shown above — extractCode() falls back to the full text when it
+                      can't find a code, so re-printing it here would just duplicate it. */}
+                  {code && <p className="mt-2 text-xs text-slate-500">{order.smsText}</p>}
+                  <p className="mt-1 font-mono text-[11px] text-amber-600 dark:text-amber-400">
+                    {t("expiresIn", { time: formatRemaining(remainingMs) })}
+                  </p>
+                </>
+              );
+            })()
+          )
         ) : order.status === "pending" ? (
           <OtpReadout length={6} className="text-2xl text-slate-400" />
         ) : (
-          <p className="text-sm text-slate-500">No code — {order.costCharged.toLocaleString()} NGN refunded</p>
+          <p className="text-sm text-slate-500">
+            {t("noCodeRefunded", { amount: order.costCharged.toLocaleString() })}
+          </p>
         )}
       </motion.div>
 
@@ -170,33 +199,27 @@ export default function OrderCard({
           onClick={() => copy(order.number, "number")}
           className="flex-1 rounded-full border border-slate-200 py-2 text-xs text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-colors focus-ring dark:border-ink-700 dark:text-slate-400 dark:hover:bg-ink-800 dark:hover:text-paper-100"
         >
-          {copied === "number" ? "Copied!" : "Copy number"}
+          {copied === "number" ? t("copied") : t("copyNumber")}
         </MotionButton>
-        {order.status === "received" && (
+        {order.status === "received" && !codeExpired && (
           <MotionButton
             onClick={() => copy(extractCode(order.smsText) || order.smsText || "", "code")}
             className="flex-1 rounded-full border border-emerald-200 bg-emerald-50 py-2 text-xs text-emerald-600 hover:bg-emerald-100 transition-colors focus-ring dark:border-mint-500/30 dark:bg-mint-500/10 dark:text-mint-400 dark:hover:bg-mint-500/20"
           >
-            {copied === "code" ? "Copied!" : "Copy code"}
+            {copied === "code" ? t("copied") : t("copyCode")}
           </MotionButton>
         )}
         {order.status === "pending" && (
           <MotionButton
             onClick={cancel}
             disabled={!canCancel || cancelling}
-            title={!canCancel ? "Available 2 minutes after purchase" : undefined}
+            title={!canCancel ? t("cancelHint") : undefined}
             className="flex-1 rounded-full border border-slate-200 py-2 text-xs text-slate-500 hover:bg-slate-50 hover:text-slate-900 disabled:opacity-40 transition-colors focus-ring dark:border-ink-700 dark:text-slate-400 dark:hover:bg-ink-800 dark:hover:text-paper-100"
           >
-            {cancelling ? "Cancelling…" : "Cancel"}
+            {cancelling ? t("cancelling") : t("cancel")}
           </MotionButton>
         )}
       </div>
     </motion.div>
   );
-}
-
-function extractCode(sms: string | null): string | null {
-  if (!sms) return null;
-  const match = sms.match(/\d[\d\s-]{2,}\d/);
-  return match ? match[0].replace(/[\s-]/g, "") : null;
 }

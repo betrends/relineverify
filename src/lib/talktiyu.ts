@@ -85,8 +85,8 @@ export function getBalance() {
 
 // Talktiyu's catalog endpoints (countries/services) can take 5-30s to
 // respond and rarely change minute to minute, so we cache successful
-// responses briefly to keep the buy flow fast on repeat loads.
-const CATALOG_CACHE_TTL_MS = 5 * 60 * 1000;
+// responses to keep the buy flow fast on repeat loads.
+const CATALOG_CACHE_TTL_MS = 30 * 60 * 1000;
 const catalogCache = new Map<string, { data: unknown; expires: number }>();
 
 async function cachedCatalog<T>(key: string, load: () => Promise<T>): Promise<T> {

@@ -2,17 +2,38 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useTheme } from "../ThemeProvider";
 import { useSearch } from "./SearchProvider";
+import { useMobileNav } from "./MobileNavProvider";
+import { selectCountry, selectService } from "@/lib/buySelectionEvents";
+import { countryCodeToFlag } from "@/lib/countryFlag";
+import ServiceIcon from "../ServiceIcon";
 
 export default function Header({ email, name }: { email: string; name?: string | null }) {
+  const t = useTranslations("dashboard.header");
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
-  const { query, setQuery } = useSearch();
+  const { toggle: toggleMobileNav } = useMobileNav();
+  const { query, setQuery, countries, services } = useSearch();
   const [notifOpen, setNotifOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  const q = query.trim().toLowerCase();
+  const matchingCountries = q ? countries.filter((c) => c.name.toLowerCase().includes(q)).slice(0, 5) : [];
+  const matchingServices = q ? services.filter((s) => s.name.toLowerCase().includes(q)).slice(0, 5) : [];
+  const hasMatches = matchingCountries.length > 0 || matchingServices.length > 0;
+
+  function jumpToBuy(pick: () => void) {
+    pick();
+    setQuery("");
+    setSearchOpen(false);
+    document.getElementById("buy")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   const fallback = email.split("@")[0].replace(/[._-]/g, " ");
   const displayName = name || fallback.charAt(0).toUpperCase() + fallback.slice(1);
@@ -27,6 +48,7 @@ export default function Header({ email, name }: { email: string; name?: string |
     function onPointerDown(e: MouseEvent) {
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false);
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) setSearchOpen(false);
     }
     document.addEventListener("mousedown", onPointerDown);
     return () => document.removeEventListener("mousedown", onPointerDown);
@@ -40,22 +62,77 @@ export default function Header({ email, name }: { email: string; name?: string |
 
   return (
     <header className="flex items-center gap-4 border-b border-slate-100 bg-white px-6 py-4 dark:border-ink-800 dark:bg-ink-950">
-      <div className="flex flex-1 items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-400 dark:border-ink-800 dark:bg-ink-900">
-        <SearchIcon />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search numbers, or orders…"
-          className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-paper-100"
-        />
-        <kbd className="hidden shrink-0 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] text-slate-400 sm:block dark:border-ink-700 dark:bg-ink-800">
-          ⌘K
-        </kbd>
+      <button
+        onClick={toggleMobileNav}
+        aria-label={t("openMenu")}
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-100 text-slate-500 hover:bg-slate-50 md:hidden dark:border-ink-800 dark:text-slate-400 dark:hover:bg-ink-900"
+      >
+        <MenuIcon />
+      </button>
+
+      <div ref={searchRef} className="relative flex-1">
+        <div className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-400 dark:border-ink-800 dark:bg-ink-900">
+          <SearchIcon />
+          <input
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSearchOpen(true);
+            }}
+            onFocus={() => setSearchOpen(true)}
+            placeholder={t("searchPlaceholder")}
+            className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-paper-100"
+          />
+          <kbd className="hidden shrink-0 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] text-slate-400 sm:block dark:border-ink-700 dark:bg-ink-800">
+            ⌘K
+          </kbd>
+        </div>
+
+        {searchOpen && q && hasMatches && (
+          <div className="absolute left-0 right-0 z-20 mt-2 max-h-80 overflow-y-auto rounded-xl border border-slate-100 bg-white p-2 shadow-lg dark:border-ink-800 dark:bg-ink-900">
+            {matchingCountries.length > 0 && (
+              <div className="mb-1">
+                <p className="px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                  {t("countries")}
+                </p>
+                {matchingCountries.map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => jumpToBuy(() => selectCountry(c.id))}
+                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-ink-800"
+                  >
+                    <span className="text-base leading-none" aria-hidden>
+                      {countryCodeToFlag(c.code)}
+                    </span>
+                    {c.name}
+                  </button>
+                ))}
+              </div>
+            )}
+            {matchingServices.length > 0 && (
+              <div>
+                <p className="px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                  {t("services")}
+                </p>
+                {matchingServices.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => jumpToBuy(() => selectService(s.id))}
+                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-ink-800"
+                  >
+                    <ServiceIcon name={s.name} className="h-5 w-5" />
+                    {s.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <button
         onClick={toggleTheme}
-        aria-label="Toggle theme"
+        aria-label={t("toggleTheme")}
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-100 text-slate-500 hover:bg-slate-50 dark:border-ink-800 dark:text-slate-400 dark:hover:bg-ink-900"
       >
         {theme === "light" ? <MoonIcon /> : <SunIcon />}
@@ -64,7 +141,7 @@ export default function Header({ email, name }: { email: string; name?: string |
       <div ref={notifRef} className="relative shrink-0">
         <button
           onClick={() => setNotifOpen((v) => !v)}
-          aria-label="Notifications"
+          aria-label={t("notifications")}
           className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 text-slate-500 hover:bg-slate-50 dark:border-ink-800 dark:text-slate-400 dark:hover:bg-ink-900"
         >
           <BellIcon />
@@ -74,7 +151,7 @@ export default function Header({ email, name }: { email: string; name?: string |
         </button>
         {notifOpen && (
           <div className="absolute right-0 z-20 mt-2 w-64 rounded-xl border border-slate-100 bg-white p-4 text-sm text-slate-500 shadow-lg dark:border-ink-800 dark:bg-ink-900 dark:text-slate-400">
-            No new notifications yet — order updates will show up here.
+            {t("noNotifications")}
           </div>
         )}
       </div>
@@ -98,7 +175,7 @@ export default function Header({ email, name }: { email: string; name?: string |
               onClick={logout}
               className="w-full px-4 py-2.5 text-left text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-ink-800"
             >
-              Sign out
+              {t("signOut")}
             </button>
           </div>
         )}
@@ -112,6 +189,14 @@ function SearchIcon() {
     <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="shrink-0">
       <circle cx="9" cy="9" r="5.5" stroke="currentColor" strokeWidth="1.5" />
       <path d="m17 17-3.5-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function MenuIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+      <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
     </svg>
   );
 }

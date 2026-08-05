@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/currentUser";
-import { ThemeProvider } from "@/components/ThemeProvider";
 import { SearchProvider } from "@/components/dashboard/SearchProvider";
+import { MobileNavProvider } from "@/components/dashboard/MobileNavProvider";
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 import Footer from "@/components/dashboard/Footer";
@@ -16,8 +16,8 @@ export default async function DashboardLayout({
   if (!user) redirect("/login");
 
   return (
-    <ThemeProvider>
-      <SearchProvider>
+    <SearchProvider>
+      <MobileNavProvider>
         <div id="top" className="flex min-h-screen bg-slate-50 text-slate-900 dark:bg-ink-950 dark:text-paper-100">
           <Sidebar />
           <div className="flex min-w-0 flex-1 flex-col">
@@ -27,7 +27,7 @@ export default async function DashboardLayout({
             <Footer />
           </div>
         </div>
-      </SearchProvider>
-    </ThemeProvider>
+      </MobileNavProvider>
+    </SearchProvider>
   );
 }

@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { SUPPORT_EMAIL } from "@/lib/contact";
 
 function getClient() {
   const apiKey = process.env.RESEND_API_KEY;
@@ -33,6 +34,46 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
         <p style="color: #94a3b8; font-size: 13px;">
           If you didn't request this, you can safely ignore this email.
         </p>
+      </div>
+    `,
+  });
+
+  if (error) throw new Error(error.message);
+  return { devMode: false as const };
+}
+
+function escapeHtml(input: string) {
+  return input
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+export async function sendContactMessage(params: { name: string; email: string; message: string }) {
+  const resend = getClient();
+  const from = process.env.EMAIL_FROM || "Reline <onboarding@resend.dev>";
+
+  if (!resend) {
+    console.log(`[email] RESEND_API_KEY not set. Contact message from ${params.email}: ${params.message}`);
+    return { devMode: true as const };
+  }
+
+  const name = escapeHtml(params.name);
+  const email = escapeHtml(params.email);
+  const message = escapeHtml(params.message);
+
+  const { error } = await resend.emails.send({
+    from,
+    to: SUPPORT_EMAIL,
+    replyTo: params.email,
+    subject: `Reline contact form: ${params.name}`,
+    html: `
+      <div style="font-family: -apple-system, sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2 style="color: #0f172a;">New contact message</h2>
+        <p style="color: #475569;"><strong>${name}</strong> (${email})</p>
+        <p style="color: #475569; line-height: 1.6; white-space: pre-wrap;">${message}</p>
       </div>
     `,
   });

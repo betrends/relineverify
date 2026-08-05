@@ -2,18 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import MotionButton from "./motion/MotionButton";
 import AnimatedError from "./motion/AnimatedError";
 import Combobox from "./Combobox";
 import HoverLift from "./motion/HoverLift";
-import { refreshWallet } from "@/lib/walletEvents";
+import { refreshWallet, prefillTopupAmount } from "@/lib/walletEvents";
+import { onSelectCountry, onSelectService } from "@/lib/buySelectionEvents";
+import { useSearch } from "./dashboard/SearchProvider";
+import { countryCodeToFlag } from "@/lib/countryFlag";
+import ServiceIcon from "./ServiceIcon";
 
 type Country = { id: string; name: string; code: string };
 type Service = { id: string; name: string; price: number; available: number };
 
-const CATALOG_TIMEOUT_MS = 20000;
+const CATALOG_TIMEOUT_MS = 35000;
 
-async function fetchCatalog(url: string) {
+async function fetchCatalog(url: string, timeoutMessage: string) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), CATALOG_TIMEOUT_MS);
   try {
@@ -23,7 +28,7 @@ async function fetchCatalog(url: string) {
     return data;
   } catch (err: any) {
     if (err.name === "AbortError") {
-      throw new Error("Talktiyu is taking too long to respond — try again");
+      throw new Error(timeoutMessage);
     }
     throw err;
   } finally {
@@ -32,6 +37,7 @@ async function fetchCatalog(url: string) {
 }
 
 export default function BuyNumberForm({ onBought }: { onBought: (order: any) => void }) {
+  const t = useTranslations("dashboard.buyNumber");
   const [servers, setServers] = useState<string[]>([]);
   const [server, setServer] = useState("");
   const [countries, setCountries] = useState<Country[]>([]);
@@ -42,6 +48,31 @@ export default function BuyNumberForm({ onBought }: { onBought: (order: any) => 
   const [loadingServices, setLoadingServices] = useState(false);
   const [buying, setBuying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { setCountries: setSearchCountries, setServices: setSearchServices } = useSearch();
+
+  useEffect(() => {
+    setSearchCountries(countries.map((c) => ({ id: c.id, name: c.name, code: c.code })));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countries]);
+
+  useEffect(() => {
+    setSearchServices(services.map((s) => ({ id: s.id, name: s.name })));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [services]);
+
+  useEffect(() => {
+    const offCountry = onSelectCountry((countryId) => {
+      if (countries.some((c) => c.id === countryId)) setCountry(countryId);
+    });
+    const offService = onSelectService((serviceId) => {
+      if (services.some((s) => s.id === serviceId)) setService(serviceId);
+    });
+    return () => {
+      offCountry();
+      offService();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countries, services]);
 
   useEffect(() => {
     fetch("/api/talktiyu/servers")
@@ -56,8 +87,11 @@ export default function BuyNumberForm({ onBought }: { onBought: (order: any) => 
     if (!server) return;
     setError(null);
     setLoadingCountries(true);
-    fetchCatalog(`/api/talktiyu/countries?server=${encodeURIComponent(server)}`)
-      .then((d) => setCountries(d.countries || []))
+    fetchCatalog(`/api/talktiyu/countries?server=${encodeURIComponent(server)}`, t("timeoutError"))
+      .then((d) => {
+        const sorted = [...(d.countries || [])].sort((a: Country, b: Country) => a.name.localeCompare(b.name));
+        setCountries(sorted);
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoadingCountries(false));
   }
@@ -69,7 +103,8 @@ export default function BuyNumberForm({ onBought }: { onBought: (order: any) => 
     fetchCatalog(
       `/api/talktiyu/services?server=${encodeURIComponent(server)}&country=${encodeURIComponent(
         country
-      )}`
+      )}`,
+      t("timeoutError")
     )
       .then((d) => setServices(d.services || []))
       .catch((err) => setError(err.message))
@@ -114,7 +149,13 @@ export default function BuyNumberForm({ onBought }: { onBought: (order: any) => 
       });
       const json = await res.json();
       if (!res.ok) {
-        setError(json.error || "Could not buy number");
+        if (typeof json.needed === "number") {
+          prefillTopupAmount(json.needed);
+          document.getElementById("topup")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          setError(t("insufficientFunds", { amount: json.needed.toLocaleString() }));
+        } else {
+          setError(json.error || t("errorGeneric"));
+        }
         return;
       }
       onBought(json.order);
@@ -127,11 +168,11 @@ export default function BuyNumberForm({ onBought }: { onBought: (order: any) => 
 
   return (
     <HoverLift id="buy" className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-ink-700 dark:bg-ink-900">
-      <h2 className="font-display text-lg font-700 text-slate-900 dark:text-paper-100">Buy a Number</h2>
-      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Pick a country and service to get a code.</p>
+      <h2 className="font-display text-lg font-700 text-slate-900 dark:text-paper-100">{t("title")}</h2>
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t("subtitle")}</p>
 
       <div className="mt-5 space-y-4">
-        <Field label="Server">
+        <Field label={t("server")}>
           <select
             value={server}
             onChange={(e) => setServer(e.target.value)}
@@ -145,37 +186,47 @@ export default function BuyNumberForm({ onBought }: { onBought: (order: any) => 
           </select>
         </Field>
 
-        <Field label="Country">
+        <Field label={t("country")}>
           <Combobox
             value={country}
             onChange={setCountry}
-            options={countries.map((c) => ({ id: c.id, label: c.name }))}
-            placeholder="Select a country"
-            searchPlaceholder="Search countries…"
+            options={countries.map((c) => ({
+              id: c.id,
+              label: c.name,
+              icon: (
+                <span className="text-base leading-none" aria-hidden>
+                  {countryCodeToFlag(c.code)}
+                </span>
+              ),
+            }))}
+            placeholder={t("selectCountry")}
+            searchPlaceholder={t("searchCountries")}
             loading={loadingCountries}
             disabled={loadingCountries || !countries.length}
           />
+          {loadingCountries && (
+            <p className="mt-1.5 text-xs text-slate-400">{t("fetchingCountries")}</p>
+          )}
         </Field>
 
-        <Field label="Service">
+        <Field label={t("service")}>
           <Combobox
             value={service}
             onChange={setService}
             options={services.map((s) => ({
               id: s.id,
               label: s.name,
-              sublabel: s.available < 1 ? "out of stock" : `₦${s.price.toLocaleString()}`,
+              sublabel: s.available < 1 ? t("outOfStock") : `₦${s.price.toLocaleString()}`,
               disabled: s.available < 1,
+              icon: <ServiceIcon name={s.name} className="h-5 w-5" />,
             }))}
-            placeholder={!country ? "Select a country first" : "Select a service"}
-            searchPlaceholder="Search services…"
+            placeholder={!country ? t("selectCountryFirst") : t("selectService")}
+            searchPlaceholder={t("searchServices")}
             loading={loadingServices}
             disabled={loadingServices || !services.length}
           />
           {loadingServices && (
-            <p className="mt-1.5 text-xs text-slate-400">
-              Fetching live prices from Talktiyu — first load can take up to 20s.
-            </p>
+            <p className="mt-1.5 text-xs text-slate-400">{t("fetchingServices")}</p>
           )}
         </Field>
       </div>
@@ -189,7 +240,7 @@ export default function BuyNumberForm({ onBought }: { onBought: (order: any) => 
             transition={{ duration: 0.2, ease: "easeOut" }}
             className="mt-4 flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 dark:bg-ink-950"
           >
-            <span className="text-sm text-slate-500 dark:text-slate-400">Price</span>
+            <span className="text-sm text-slate-500 dark:text-slate-400">{t("price")}</span>
             <span className="font-mono text-sm font-semibold text-emerald-600 dark:text-mint-400">
               ₦{selectedService.price.toLocaleString()}
             </span>
@@ -205,7 +256,7 @@ export default function BuyNumberForm({ onBought }: { onBought: (order: any) => 
             onClick={country ? loadServices : loadCountries}
             className="shrink-0 text-sm text-violet-600 underline-offset-2 hover:underline focus-ring dark:text-violet-300"
           >
-            Retry
+            {t("retry")}
           </button>
         )}
       </div>
@@ -215,7 +266,7 @@ export default function BuyNumberForm({ onBought }: { onBought: (order: any) => 
         disabled={buying || !service}
         className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-violet-600 py-3 font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60 focus-ring"
       >
-        {buying ? "Buying…" : "Buy Number"}
+        {buying ? t("buying") : t("buy")}
         {!buying && <ArrowRightIcon />}
       </MotionButton>
     </HoverLift>

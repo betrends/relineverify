@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
 
-  const limited = rateLimitOrNull(req, "resend-verification", 3, 15 * 60 * 1000);
+  const limited = await rateLimitOrNull(req, "resend-verification", 3, 15 * 60 * 1000);
   if (limited) return limited;
 
   const user = await prisma.user.findUnique({ where: { id: session.userId } });

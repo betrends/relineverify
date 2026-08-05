@@ -22,6 +22,28 @@ model User {
   transactions  Transaction[]
   resetTokens   PasswordResetToken[]
   verificationTokens EmailVerificationToken[]
+  generatedEmails GeneratedEmail[]
+
+  // Referral program: this user's own shareable code, who referred them (if
+  // anyone), and the earnings they've collected as a referrer.
+  referralCode     String?           @unique
+  referredById     String?
+  referredBy       User?             @relation("Referrals", fields: [referredById], references: [id])
+  referrals        User[]            @relation("Referrals")
+  referralEarnings ReferralEarning[] @relation("ReferrerEarnings")
+}
+
+model ReferralEarning {
+  id             String   @id @default(cuid())
+  referrerId     String
+  referrer       User     @relation("ReferrerEarnings", fields: [referrerId], references: [id], onDelete: Cascade)
+  referredUserId String
+  topupAmount    Int // the referred user's top-up amount (NGN) this reward was earned from
+  rewardAmount   Int // 5% of topupAmount, credited to the referrer's wallet
+  topupReference String   @unique // ties back to the originating topup Transaction
+  createdAt      DateTime @default(now())
+
+  @@index([referrerId])
 }
 
 model PasswordResetToken {
@@ -52,11 +74,26 @@ model Transaction {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type      String // "topup" | "purchase" | "refund"
+  type      String // "topup" | "purchase" | "refund" | "email" | "referral"
   amount    Int
   reference String   @unique
   status    String // "pending" | "successful" | "failed"
   createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model GeneratedEmail {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  address      String   @unique
+  mailPassword String // temp-mail provider account password — server-only, never returned to the client
+  costCharged  Int
+  emailText    String?
+  status       String // "pending" | "received" | "expired"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@index([userId])
 }

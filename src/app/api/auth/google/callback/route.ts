@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSessionToken, setSessionCookie } from "@/lib/session";
+import { findReferrerByCode } from "@/lib/referral";
 
 type GoogleTokenResponse = {
   access_token: string;
@@ -71,6 +72,9 @@ export async function GET(req: NextRequest) {
       });
     }
   } else {
+    const refCookie = req.cookies.get("google_oauth_ref")?.value;
+    const referrer = refCookie ? await findReferrerByCode(refCookie) : null;
+
     user = await prisma.user.create({
       data: {
         email,
@@ -80,6 +84,7 @@ export async function GET(req: NextRequest) {
         walletBalance: 0,
         // Google already verified this address for us.
         emailVerifiedAt: new Date(),
+        referredById: referrer?.id,
       },
     });
   }
@@ -90,5 +95,6 @@ export async function GET(req: NextRequest) {
   const res = NextResponse.redirect(new URL("/dashboard", appUrl));
   res.cookies.set("google_oauth_state", "", { path: "/", maxAge: 0 });
   res.cookies.set("google_oauth_from", "", { path: "/", maxAge: 0 });
+  res.cookies.set("google_oauth_ref", "", { path: "/", maxAge: 0 });
   return res;
 }

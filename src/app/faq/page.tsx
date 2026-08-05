@@ -1,0 +1,42 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import SiteNav from "@/components/SiteNav";
+import SiteFooter from "@/components/SiteFooter";
+import Reveal from "@/components/motion/Reveal";
+import FaqAccordion from "@/components/dashboard/FaqAccordion";
+
+export const metadata: Metadata = {
+  title: "FAQ — Reline",
+  description: "Answers to common questions about Reline's virtual numbers, temporary emails, wallet, and delivery times.",
+};
+
+export default function FaqPage() {
+  return (
+    <div className="min-h-screen bg-white text-slate-900 dark:bg-ink-950 dark:text-paper-100">
+      <SiteNav />
+
+      <section className="mx-auto max-w-3xl px-6 py-20">
+        <Reveal>
+          <h1 className="font-display text-3xl font-700 tracking-tight text-slate-900 dark:text-paper-100">
+            Frequently asked questions
+          </h1>
+          <p className="mt-2 text-slate-500 dark:text-slate-400">
+            Can't find what you're looking for?{" "}
+            <Link href="/contact" className="font-medium text-violet-600 hover:underline dark:text-violet-300">
+              Contact us
+            </Link>
+            .
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.05} className="mt-8">
+          <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-ink-700 dark:bg-ink-900 sm:p-8">
+            <FaqAccordion />
+          </div>
+        </Reveal>
+      </section>
+
+      <SiteFooter />
+    </div>
+  );
+}

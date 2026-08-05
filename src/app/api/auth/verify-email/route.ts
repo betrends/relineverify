@@ -6,7 +6,7 @@ import { getSession } from "@/lib/session";
 
 export async function GET(req: NextRequest) {
   const appUrl = process.env.APP_URL || req.nextUrl.origin;
-  const limited = rateLimitOrNull(req, "verify-email", 20, 60 * 60 * 1000);
+  const limited = await rateLimitOrNull(req, "verify-email", 20, 60 * 60 * 1000);
   if (limited) return limited;
 
   const token = req.nextUrl.searchParams.get("token");

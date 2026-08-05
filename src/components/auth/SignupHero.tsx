@@ -2,37 +2,7 @@
 
 import { motion } from "framer-motion";
 import Reveal from "../motion/Reveal";
-import OtpReadout from "../OtpReadout";
-
-const FEATURES = [
-  {
-    title: "Instant Delivery",
-    bg: "bg-violet-50",
-    color: "text-violet-600",
-    darkBg: "dark:bg-violet-500/10",
-    darkColor: "dark:text-violet-300",
-    icon: <BoltIcon />,
-    pos: "-left-2 -top-6",
-  },
-  {
-    title: "Private & Secure",
-    bg: "bg-emerald-50",
-    color: "text-emerald-600",
-    darkBg: "dark:bg-emerald-500/10",
-    darkColor: "dark:text-emerald-300",
-    icon: <ShieldIcon />,
-    pos: "-right-2 -top-10",
-  },
-  {
-    title: "Global Coverage",
-    bg: "bg-blue-50",
-    color: "text-blue-600",
-    darkBg: "dark:bg-blue-500/10",
-    darkColor: "dark:text-blue-300",
-    icon: <GlobeIcon />,
-    pos: "-left-2 -bottom-6",
-  },
-];
+import LiveFeedCard from "../motion/LiveFeedCard";
 
 const STATS = [
   { value: "2.3s", label: "Avg. Delivery", icon: <BoltIcon /> },
@@ -79,14 +49,14 @@ export default function SignupHero() {
 
         <Reveal delay={0.15} className="mt-3">
           <p className="max-w-md text-slate-500 dark:text-slate-400">
-            Rent virtual phone numbers for WhatsApp, Telegram, Google and 500+ services. Receive OTPs
-            instantly. No SIM required.
+            Rent virtual phone numbers or generate temporary email addresses for WhatsApp, Telegram, Google
+            and 500+ services. Receive codes instantly. No SIM required.
           </p>
         </Reveal>
       </div>
 
       <div className="relative flex flex-1 items-center justify-center py-4">
-        <CodeCardIllustration />
+        <LiveFeedCard />
       </div>
 
       <div className="relative mt-4 space-y-4">
@@ -125,77 +95,6 @@ export default function SignupHero() {
           © {new Date().getFullYear()} Reline. All rights reserved.
         </p>
       </div>
-    </div>
-  );
-}
-
-function CodeCardIllustration() {
-  const bubbles = [
-    { label: "TG", bg: "bg-sky-500 text-white", pos: "left-1/2 -top-2 -translate-x-1/2", icon: <PaperPlaneIcon /> },
-    { label: "TT", bg: "bg-slate-900 text-white", pos: "right-0 top-1/2 -translate-y-1/2", icon: <MusicNoteIcon /> },
-    { label: "WA", bg: "bg-emerald-500 text-white", pos: "left-0 top-1/2 -translate-y-1/2", icon: <ChatIcon /> },
-    { label: "GO", bg: "bg-white text-blue-500 border-2 border-slate-200", pos: "left-1/2 -bottom-2 -translate-x-1/2", icon: "G" },
-    { label: "DC", bg: "bg-indigo-500 text-white", pos: "right-2 -bottom-3", icon: <ControllerIcon /> },
-  ];
-
-  return (
-    <div className="relative mx-auto w-full max-w-sm py-8">
-      <svg className="absolute -inset-16 -z-10 text-violet-100" viewBox="0 0 300 300" fill="none" preserveAspectRatio="none">
-        <circle cx="150" cy="150" r="140" stroke="currentColor" strokeWidth="1" strokeDasharray="3 6" />
-        <circle cx="150" cy="150" r="110" stroke="currentColor" strokeWidth="1" strokeDasharray="3 6" />
-      </svg>
-
-      {FEATURES.map((f) => (
-        <motion.div
-          key={f.title}
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: Math.random() }}
-          className={`absolute z-10 ${f.pos} flex w-20 flex-col items-center gap-1.5 text-center`}
-        >
-          <span
-            className={`flex h-11 w-11 items-center justify-center rounded-full shadow-md ${f.bg} ${f.color} ${f.darkBg} ${f.darkColor}`}
-          >
-            {f.icon}
-          </span>
-          <span className="text-[11px] font-medium leading-tight text-slate-600 dark:text-slate-300">{f.title}</span>
-        </motion.div>
-      ))}
-
-      {bubbles.map((b) => (
-        <motion.span
-          key={b.label}
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: Math.random() }}
-          className={`absolute z-10 ${b.pos} flex h-12 w-12 items-center justify-center rounded-full text-sm font-bold shadow-md ${b.bg}`}
-        >
-          {b.icon}
-        </motion.span>
-      ))}
-
-      <motion.div
-        animate={{ y: [0, -10, 0] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-        className="relative z-20 mx-auto w-full max-w-[16rem] rounded-[24px] border border-slate-100 bg-white p-5 shadow-xl dark:border-ink-700 dark:bg-ink-900"
-      >
-        <div className="flex items-center gap-1.5 border-b border-slate-100 pb-3 dark:border-ink-800">
-          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-violet-500 text-white">
-            <BoltIcon className="h-3.5 w-3.5" />
-          </span>
-          <span className="text-sm font-semibold text-slate-900 dark:text-paper-100">Reline</span>
-          <span className="ml-auto flex items-center gap-1 text-[10px] text-emerald-600 dark:text-mint-400">
-            <span className="h-1 w-1 rounded-full bg-emerald-500 animate-pulseDot" />
-            live
-          </span>
-        </div>
-        <div className="py-5 text-center">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Your verification code</p>
-          <OtpReadout resolved="482 913" length={7} className="mt-2 text-3xl text-slate-900 dark:text-paper-100" />
-        </div>
-        <div className="flex items-center justify-center gap-1.5 rounded-lg bg-emerald-50 py-2 text-xs font-medium text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300">
-          <CheckIcon />
-          Received in 2.3s
-        </div>
-      </motion.div>
     </div>
   );
 }
@@ -265,51 +164,3 @@ function StarIcon() {
   );
 }
 
-function CheckIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
-      <circle cx="10" cy="10" r="8" fill="currentColor" opacity="0.15" />
-      <path d="M6.5 10.3 9 12.8 13.8 7.7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function PaperPlaneIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-      <path d="m3 10.3 13-5.4c.6-.3 1.2.2 1 .9l-2.2 10.6c-.2.8-1 1-1.6.6l-3.5-2.6-1.8 1.8c-.2.2-.5.2-.6-.1l-.4-3 8-6.6-9.5 5.4-2.1-.7c-.7-.2-.8-1 .1-1.3Z" fill="currentColor" />
-    </svg>
-  );
-}
-
-function ChatIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-      <path d="M10 3a7 7 0 0 0-6 10.6L3 17l3.5-1a7 7 0 1 0 3.5-13Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function MusicNoteIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-      <path
-        d="M8 15a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <path d="M10.2 12.8V3.5c1 1.6 2.5 2.5 4.3 2.6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function ControllerIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-      <rect x="3" y="7" width="14" height="8" rx="4" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M7 9v4M5 11h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-      <circle cx="14" cy="10" r="0.9" fill="currentColor" />
-      <circle cx="14.5" cy="12.3" r="0.9" fill="currentColor" />
-    </svg>
-  );
-}

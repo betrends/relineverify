@@ -8,7 +8,7 @@ import { rateLimitOrNull } from "@/lib/rateLimit";
 const schema = z.object({ password: z.string().optional() });
 
 export async function POST(req: NextRequest) {
-  const limited = rateLimitOrNull(req, "delete-account", 10, 60 * 60 * 1000);
+  const limited = await rateLimitOrNull(req, "delete-account", 10, 60 * 60 * 1000);
   if (limited) return limited;
 
   const session = await getSession();

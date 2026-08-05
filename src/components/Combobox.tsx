@@ -7,6 +7,7 @@ export type ComboboxOption = {
   label: string;
   sublabel?: string;
   disabled?: boolean;
+  icon?: React.ReactNode;
 };
 
 export default function Combobox({
@@ -103,8 +104,9 @@ export default function Combobox({
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left text-sm text-slate-900 focus-ring focus:border-violet-500 disabled:opacity-60 dark:border-ink-700 dark:bg-ink-950 dark:text-paper-100"
       >
-        <span className={selected ? "" : "text-slate-400"}>
-          {loading ? "Loading…" : selected ? selected.label : placeholder}
+        <span className={`flex min-w-0 items-center gap-2 ${selected ? "" : "text-slate-400"}`}>
+          {!loading && selected?.icon}
+          <span className="truncate">{loading ? "Loading…" : selected ? selected.label : placeholder}</span>
         </span>
         <svg
           className={`h-4 w-4 shrink-0 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
@@ -120,6 +122,14 @@ export default function Combobox({
           />
         </svg>
       </button>
+
+      {open && (
+        // Long option lists can overlap unrelated cards below in a narrow
+        // column — a scrim makes it clear this is a floating layer over
+        // the page, not a rendering glitch, and gives an obvious click
+        // target to dismiss it.
+        <div className="fixed inset-0 z-10 bg-slate-900/5 dark:bg-black/40" onClick={() => setOpen(false)} aria-hidden />
+      )}
 
       {open && (
         <div className="absolute z-20 mt-1.5 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-ink-700 dark:bg-ink-900">
@@ -149,7 +159,10 @@ export default function Combobox({
                         : "text-slate-600 dark:text-slate-300"
                   }`}
                 >
-                  <span>{o.label}</span>
+                  <span className="flex min-w-0 items-center gap-2">
+                    {o.icon}
+                    <span className="truncate">{o.label}</span>
+                  </span>
                   {o.sublabel && (
                     <span className="ml-3 shrink-0 font-mono text-xs text-slate-400">{o.sublabel}</span>
                   )}

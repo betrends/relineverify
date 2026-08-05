@@ -1,9 +1,8 @@
 import Reveal from "@/components/motion/Reveal";
 import HoverLift from "@/components/motion/HoverLift";
 import FaqAccordion from "@/components/dashboard/FaqAccordion";
+import { SUPPORT_EMAIL, WHATSAPP_NUMBER } from "@/lib/contact";
 
-const SUPPORT_EMAIL = "mgbedikekosi34@gmail.com";
-const WHATSAPP_NUMBER = "2347077653808";
 const WHATSAPP_MESSAGE = "Hi Reline support, I need help with my account.";
 
 export default function SupportPage() {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { verifyTransaction } from "@/lib/korapay";
+import { calculateReferralReward } from "@/lib/referral";
 
 /**
  * Korapay calls this endpoint after a payment event. The signature is an
@@ -45,6 +46,7 @@ export async function POST(req: NextRequest) {
 
   const transaction = await prisma.transaction.findUnique({
     where: { reference },
+    include: { user: { select: { referredById: true } } },
   });
   if (!transaction) {
     return NextResponse.json({ error: "Unknown transaction" }, { status: 404 });
@@ -70,16 +72,54 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  await prisma.$transaction([
-    prisma.transaction.update({
-      where: { id: transaction.id },
+  await prisma.$transaction(async (tx) => {
+    // Korapay's own docs warn webhook deliveries can be retried/duplicated —
+    // guard the transition so only the delivery that actually flips this
+    // transaction away from "pending" gets to credit anyone's wallet.
+    // Otherwise two concurrent deliveries could both pass the earlier
+    // `status !== "pending"` check and double-credit the same top-up.
+    const claimed = await tx.transaction.updateMany({
+      where: { id: transaction.id, status: "pending" },
       data: { status: "successful" },
-    }),
-    prisma.user.update({
+    });
+    if (claimed.count === 0) return;
+
+    await tx.user.update({
       where: { id: transaction.userId },
       data: { walletBalance: { increment: transaction.amount } },
-    }),
-  ]);
+    });
+
+    // Referral program: 5% of every top-up a referred user makes goes to
+    // whoever referred them, for as long as the referral relationship exists.
+    const referrerId = transaction.type === "topup" ? transaction.user.referredById : null;
+    if (referrerId) {
+      const rewardAmount = calculateReferralReward(transaction.amount);
+      if (rewardAmount > 0) {
+        await tx.user.update({
+          where: { id: referrerId },
+          data: { walletBalance: { increment: rewardAmount } },
+        });
+        await tx.transaction.create({
+          data: {
+            userId: referrerId,
+            type: "referral",
+            amount: rewardAmount,
+            reference: `referral_${reference}`,
+            status: "successful",
+          },
+        });
+        await tx.referralEarning.create({
+          data: {
+            referrerId,
+            referredUserId: transaction.userId,
+            topupAmount: transaction.amount,
+            rewardAmount,
+            topupReference: reference,
+          },
+        });
+      }
+    }
+  });
 
   return NextResponse.json({ ok: true });
 }

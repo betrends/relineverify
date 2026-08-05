@@ -40,10 +40,14 @@ export default function SignupForm() {
   const [ssoNotice, setSsoNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [referralCode, setReferralCode] = useState<string | null>(null);
 
   useEffect(() => {
-    const oauthError = new URLSearchParams(window.location.search).get("error");
+    const params = new URLSearchParams(window.location.search);
+    const oauthError = params.get("error");
     if (oauthError) setError(oauthError);
+    const ref = params.get("ref");
+    if (ref) setReferralCode(ref);
   }, []);
 
   async function onSubmit(e: React.FormEvent) {
@@ -65,6 +69,7 @@ export default function SignupForm() {
           phone: phone ? `${countryCode} ${phone}` : undefined,
           email,
           password,
+          referralCode: referralCode || undefined,
         }),
       });
       const json = await res.json();
@@ -96,6 +101,11 @@ export default function SignupForm() {
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           Join Reline and start receiving verification codes in seconds.
         </p>
+        {referralCode && (
+          <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300">
+            ✓ Referral code {referralCode} applied
+          </p>
+        )}
 
         <form onSubmit={onSubmit} className="mt-8 space-y-5">
           <Field label="Full Name">
@@ -185,13 +195,21 @@ export default function SignupForm() {
             />
             <span>
               I agree to the{" "}
-              <a href="#" className="text-violet-600 hover:underline dark:text-violet-300">
+              <Link
+                href="/terms"
+                target="_blank"
+                className="text-violet-600 hover:underline dark:text-violet-300"
+              >
                 Terms of Service
-              </a>{" "}
+              </Link>{" "}
               and{" "}
-              <a href="#" className="text-violet-600 hover:underline dark:text-violet-300">
+              <Link
+                href="/privacy"
+                target="_blank"
+                className="text-violet-600 hover:underline dark:text-violet-300"
+              >
                 Privacy Policy
-              </a>
+              </Link>
             </span>
           </label>
 
@@ -214,7 +232,7 @@ export default function SignupForm() {
 
           <div className="grid grid-cols-2 gap-3">
             <a
-              href="/api/auth/google"
+              href={referralCode ? `/api/auth/google?ref=${encodeURIComponent(referralCode)}` : "/api/auth/google"}
               className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 focus-ring dark:border-ink-700 dark:text-slate-300 dark:hover:bg-ink-800"
             >
               <GoogleLogo />

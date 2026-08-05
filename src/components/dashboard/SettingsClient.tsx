@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import MotionButton from "../motion/MotionButton";
 import AnimatedError from "../motion/AnimatedError";
 import HoverLift from "../motion/HoverLift";
@@ -18,6 +19,7 @@ type Me = {
 };
 
 export default function SettingsClient() {
+  const t = useTranslations("dashboard.settings");
   const [me, setMe] = useState<Me | null>(null);
   const [justVerified, setJustVerified] = useState(false);
 
@@ -46,7 +48,7 @@ export default function SettingsClient() {
       {justVerified && (
         <Reveal>
           <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300">
-            Your email is verified. Thanks!
+            {t("justVerified")}
           </div>
         </Reveal>
       )}
@@ -87,6 +89,7 @@ function inputClass() {
 }
 
 function ProfileCard({ me, onSaved }: { me: Me; onSaved: (patch: Partial<Me>) => void }) {
+  const t = useTranslations("dashboard.settings");
   const [name, setName] = useState(me.name || "");
   const [phone, setPhone] = useState(me.phone || "");
   const [error, setError] = useState<string | null>(null);
@@ -106,52 +109,52 @@ function ProfileCard({ me, onSaved }: { me: Me; onSaved: (patch: Partial<Me>) =>
       });
       const json = await res.json().catch(() => null);
       if (!res.ok) {
-        setError(json?.error || "Something went wrong");
+        setError(json?.error || t("errorGeneric"));
         return;
       }
       onSaved(json);
-      setSuccess("Profile updated");
+      setSuccess(t("profileUpdated"));
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <Card title="Profile" subtitle="Your basic account details.">
+    <Card title={t("profileTitle")} subtitle={t("profileSubtitle")}>
       <form onSubmit={onSubmit} className="space-y-4">
-        <Field label="Email Address">
+        <Field label={t("emailAddress")}>
           <div className="flex items-center gap-2">
             <input value={me.email} disabled className={`${inputClass()} cursor-not-allowed opacity-60`} />
             {me.emailVerified ? (
               <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300">
-                Verified
+                {t("verified")}
               </span>
             ) : (
               <span className="shrink-0 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
-                Unverified
+                {t("unverified")}
               </span>
             )}
           </div>
           <p className="mt-1.5 text-xs text-slate-400">
-            Signed in with {me.hasGoogle ? "Google" : "email & password"}
-            {me.hasGoogle && me.hasPassword ? " and password" : ""}
+            {me.hasGoogle ? t("signedInWithGoogle") : t("signedInWithEmail")}
+            {me.hasGoogle && me.hasPassword ? t("andPassword") : ""}
           </p>
         </Field>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Full Name">
+          <Field label={t("fullName")}>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your full name"
+              placeholder={t("enterFullName")}
               className={inputClass()}
             />
           </Field>
-          <Field label="Phone Number">
+          <Field label={t("phoneNumber")}>
             <input
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="Enter your phone number"
+              placeholder={t("enterPhoneNumber")}
               className={inputClass()}
             />
           </Field>
@@ -165,7 +168,7 @@ function ProfileCard({ me, onSaved }: { me: Me; onSaved: (patch: Partial<Me>) =>
           disabled={loading}
           className="rounded-xl bg-gradient-to-r from-violet-500 to-violet-600 px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50 focus-ring"
         >
-          {loading ? "Saving…" : "Save changes"}
+          {loading ? t("saving") : t("saveChanges")}
         </MotionButton>
       </form>
     </Card>
@@ -173,6 +176,7 @@ function ProfileCard({ me, onSaved }: { me: Me; onSaved: (patch: Partial<Me>) =>
 }
 
 function PasswordCard({ hasPassword, onChanged }: { hasPassword: boolean; onChanged: () => void }) {
+  const t = useTranslations("dashboard.settings");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -186,7 +190,7 @@ function PasswordCard({ hasPassword, onChanged }: { hasPassword: boolean; onChan
     setSuccess(null);
 
     if (newPassword !== confirmPassword) {
-      setError("Passwords don't match");
+      setError(t("passwordsDontMatch"));
       return;
     }
 
@@ -199,13 +203,13 @@ function PasswordCard({ hasPassword, onChanged }: { hasPassword: boolean; onChan
       });
       const json = await res.json().catch(() => null);
       if (!res.ok) {
-        setError(json?.error || "Something went wrong");
+        setError(json?.error || t("errorGeneric"));
         return;
       }
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setSuccess(hasPassword ? "Password updated" : "Password set — you can now log in with email too");
+      setSuccess(hasPassword ? t("passwordUpdated") : t("passwordSet"));
       onChanged();
     } finally {
       setLoading(false);
@@ -214,46 +218,42 @@ function PasswordCard({ hasPassword, onChanged }: { hasPassword: boolean; onChan
 
   return (
     <Card
-      title={hasPassword ? "Change password" : "Set a password"}
-      subtitle={
-        hasPassword
-          ? "Update the password you use to log in."
-          : "You signed up with Google — set a password to also log in with email."
-      }
+      title={hasPassword ? t("changePassword") : t("setPassword")}
+      subtitle={hasPassword ? t("updatePasswordSubtitle") : t("setPasswordSubtitle")}
     >
       <form onSubmit={onSubmit} className="space-y-4">
         {hasPassword && (
-          <Field label="Current Password">
+          <Field label={t("currentPassword")}>
             <input
               type="password"
               required
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Enter your current password"
+              placeholder={t("enterCurrentPassword")}
               className={inputClass()}
             />
           </Field>
         )}
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="New Password">
+          <Field label={t("newPassword")}>
             <input
               type="password"
               required
               minLength={8}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Create a strong password"
+              placeholder={t("createStrongPassword")}
               className={inputClass()}
             />
           </Field>
-          <Field label="Confirm New Password">
+          <Field label={t("confirmNewPassword")}>
             <input
               type="password"
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm your new password"
+              placeholder={t("confirmYourNewPassword")}
               className={inputClass()}
             />
           </Field>
@@ -267,7 +267,7 @@ function PasswordCard({ hasPassword, onChanged }: { hasPassword: boolean; onChan
           disabled={loading}
           className="rounded-xl bg-gradient-to-r from-violet-500 to-violet-600 px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50 focus-ring"
         >
-          {loading ? "Saving…" : hasPassword ? "Update password" : "Set password"}
+          {loading ? t("saving") : hasPassword ? t("updatePassword") : t("setPassword")}
         </MotionButton>
       </form>
     </Card>
@@ -275,6 +275,7 @@ function PasswordCard({ hasPassword, onChanged }: { hasPassword: boolean; onChan
 }
 
 function DangerZoneCard({ hasPassword }: { hasPassword: boolean }) {
+  const t = useTranslations("dashboard.settings");
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [password, setPassword] = useState("");
@@ -294,7 +295,7 @@ function DangerZoneCard({ hasPassword }: { hasPassword: boolean }) {
       });
       const json = await res.json().catch(() => null);
       if (!res.ok) {
-        setError(json?.error || "Something went wrong");
+        setError(json?.error || t("errorGeneric"));
         return;
       }
       router.push("/");
@@ -306,33 +307,31 @@ function DangerZoneCard({ hasPassword }: { hasPassword: boolean }) {
 
   return (
     <div className="rounded-2xl border border-red-100 bg-red-50/40 p-6 dark:border-red-500/20 dark:bg-red-500/5">
-      <h2 className="font-display text-lg font-700 text-red-700 dark:text-red-400">Danger zone</h2>
-      <p className="mt-1 text-sm text-red-600/80 dark:text-red-400/70">
-        Permanently delete your account, wallet balance, and order history. This can&apos;t be undone.
-      </p>
+      <h2 className="font-display text-lg font-700 text-red-700 dark:text-red-400">{t("dangerZone")}</h2>
+      <p className="mt-1 text-sm text-red-600/80 dark:text-red-400/70">{t("dangerZoneDesc")}</p>
 
       {!open ? (
         <MotionButton
           onClick={() => setOpen(true)}
           className="mt-5 rounded-xl border border-red-300 px-5 py-2.5 text-sm font-medium text-red-700 hover:bg-red-100 focus-ring dark:border-red-500/40 dark:text-red-400 dark:hover:bg-red-500/10"
         >
-          Delete account
+          {t("deleteAccount")}
         </MotionButton>
       ) : (
         <form onSubmit={onDelete} className="mt-5 space-y-4">
           {hasPassword && (
-            <Field label="Enter your password to confirm">
+            <Field label={t("enterPasswordToConfirm")}>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Your password"
+                placeholder={t("yourPassword")}
                 className={inputClass()}
               />
             </Field>
           )}
-          <Field label={'Type "DELETE" to confirm'}>
+          <Field label={t("typeDeleteToConfirm")}>
             <input
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
@@ -349,7 +348,7 @@ function DangerZoneCard({ hasPassword }: { hasPassword: boolean }) {
               disabled={loading || confirmText !== "DELETE"}
               className="rounded-xl bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50 focus-ring"
             >
-              {loading ? "Deleting…" : "Permanently delete account"}
+              {loading ? t("deleting") : t("permanentlyDelete")}
             </MotionButton>
             <button
               type="button"
@@ -361,7 +360,7 @@ function DangerZoneCard({ hasPassword }: { hasPassword: boolean }) {
               }}
               className="text-sm font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
             >
-              Cancel
+              {t("cancel")}
             </button>
           </div>
         </form>

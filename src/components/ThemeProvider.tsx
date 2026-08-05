@@ -11,22 +11,32 @@ const ThemeContext = createContext<{ theme: Theme; toggleTheme: () => void }>({
 
 const STORAGE_KEY = "reline-theme";
 
+// No stored preference yet — default to the visitor's actual local time of
+// day rather than guessing. Deliberately not tied to OS dark-mode setting:
+// the ask was to detect night, not to mirror system appearance.
+function isNightNow() {
+  const hour = new Date().getHours();
+  return hour >= 19 || hour < 6;
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
-  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
-    if (stored === "light" || stored === "dark") setTheme(stored);
-    setHydrated(true);
+    if (stored === "light" || stored === "dark") {
+      setTheme(stored);
+    } else {
+      setTheme(isNightNow() ? "dark" : "light");
+    }
   }, []);
 
-  useEffect(() => {
-    if (hydrated) localStorage.setItem(STORAGE_KEY, theme);
-  }, [theme, hydrated]);
-
   function toggleTheme() {
-    setTheme((t) => (t === "light" ? "dark" : "light"));
+    setTheme((t) => {
+      const next = t === "light" ? "dark" : "light";
+      localStorage.setItem(STORAGE_KEY, next);
+      return next;
+    });
   }
 
   return (

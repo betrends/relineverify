@@ -49,7 +49,11 @@ export async function POST(req: NextRequest) {
       where: { id: session.userId },
     });
     if (user.walletBalance < charged) {
-      return NextResponse.json({ error: "Insufficient wallet balance" }, { status: 400 });
+      const needed = Math.max(charged - user.walletBalance, 100);
+      return NextResponse.json(
+        { error: "Insufficient wallet balance", needed },
+        { status: 400 }
+      );
     }
 
     const talktiyuOrder = await createOrder({

@@ -5,6 +5,7 @@ export async function GET(req: NextRequest) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const appUrl = process.env.APP_URL || req.nextUrl.origin;
   const from = req.nextUrl.searchParams.get("from") === "login" ? "login" : "signup";
+  const ref = req.nextUrl.searchParams.get("ref")?.trim().slice(0, 20) || "";
 
   if (!clientId) {
     return NextResponse.redirect(
@@ -32,5 +33,6 @@ export async function GET(req: NextRequest) {
   };
   res.cookies.set("google_oauth_state", state, cookieOpts);
   res.cookies.set("google_oauth_from", from, cookieOpts);
+  if (ref) res.cookies.set("google_oauth_ref", ref, cookieOpts);
   return res;
 }
