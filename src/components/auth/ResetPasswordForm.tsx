@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import MotionButton from "../motion/MotionButton";
 import AnimatedError from "../motion/AnimatedError";
 import ThemeToggleButton from "../ThemeToggleButton";
 
 export default function ResetPasswordForm() {
+  const t = useTranslations("auth.resetPassword");
+  const tc = useTranslations("auth.common");
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
   const [password, setPassword] = useState("");
@@ -26,11 +29,11 @@ export default function ResetPasswordForm() {
     setError(null);
 
     if (password !== confirmPassword) {
-      setError("Passwords don't match");
+      setError(tc("passwordsDontMatch"));
       return;
     }
     if (!token) {
-      setError("This reset link is missing its token. Request a new one.");
+      setError(t("missingToken"));
       return;
     }
 
@@ -43,7 +46,7 @@ export default function ResetPasswordForm() {
       });
       const json = await res.json().catch(() => null);
       if (!res.ok) {
-        setError(json?.error || "Something went wrong");
+        setError(json?.error || tc("errorGeneric"));
         return;
       }
       setDone(true);
@@ -58,7 +61,7 @@ export default function ResetPasswordForm() {
       <div className="flex items-center justify-end gap-4 text-sm text-slate-500 dark:text-slate-400">
         <ThemeToggleButton />
         <Link href="/login" className="font-medium text-violet-600 hover:underline dark:text-violet-300">
-          Back to log in
+          {t("backToLogin")}
         </Link>
       </div>
 
@@ -69,23 +72,19 @@ export default function ResetPasswordForm() {
               <CheckIcon />
             </span>
             <h1 className="mt-4 font-display text-3xl font-700 tracking-tight text-slate-900 dark:text-paper-100">
-              Password updated
+              {t("passwordUpdatedTitle")}
             </h1>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-              Taking you to log in…
-            </p>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{t("takingYouToLogin")}</p>
           </>
         ) : (
           <>
             <h1 className="font-display text-3xl font-700 tracking-tight text-slate-900 dark:text-paper-100">
-              Set a new password
+              {t("title")}
             </h1>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-              Choose a strong password you haven&apos;t used before.
-            </p>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{t("subtitle")}</p>
 
             <form onSubmit={onSubmit} className="mt-8 space-y-5">
-              <Field label="New Password">
+              <Field label={t("newPassword")}>
                 <div className="flex items-center gap-2 rounded-xl border border-slate-200 px-3.5 py-3 focus-within:border-violet-500 dark:border-ink-700">
                   <LockIcon />
                   <input
@@ -94,7 +93,7 @@ export default function ResetPasswordForm() {
                     minLength={8}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Create a strong password"
+                    placeholder={t("createPassword")}
                     className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-paper-100 dark:placeholder:text-slate-500"
                   />
                   <button
@@ -105,12 +104,10 @@ export default function ResetPasswordForm() {
                     {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                   </button>
                 </div>
-                <p className="mt-1.5 text-xs text-slate-400">
-                  Use at least 8 characters with a mix of letters, numbers &amp; symbols.
-                </p>
+                <p className="mt-1.5 text-xs text-slate-400">{t("passwordHint")}</p>
               </Field>
 
-              <Field label="Confirm New Password">
+              <Field label={t("confirmNewPassword")}>
                 <div className="flex items-center gap-2 rounded-xl border border-slate-200 px-3.5 py-3 focus-within:border-violet-500 dark:border-ink-700">
                   <LockIcon />
                   <input
@@ -118,7 +115,7 @@ export default function ResetPasswordForm() {
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm your new password"
+                    placeholder={t("confirmYourNewPassword")}
                     className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-paper-100 dark:placeholder:text-slate-500"
                   />
                 </div>
@@ -131,7 +128,7 @@ export default function ResetPasswordForm() {
                 disabled={loading}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-violet-600 py-3.5 font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50 focus-ring"
               >
-                {loading ? "Updating…" : "Update password"}
+                {loading ? t("updating") : t("updatePassword")}
                 {!loading && <ArrowRightIcon />}
               </MotionButton>
             </form>

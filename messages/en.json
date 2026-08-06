@@ -108,8 +108,8 @@
       "selectService": "Select a service or platform",
       "searchCountries": "Search countries…",
       "searchServices": "Search services…",
-      "fetchingCountries": "Fetching live availability from Talktiyu — first load can take up to 30s.",
-      "fetchingServices": "Fetching live prices from Talktiyu — first load can take up to 30s.",
+      "fetchingCountries": "Checking live availability — first load can take up to 30s.",
+      "fetchingServices": "Checking live prices — first load can take up to 30s.",
       "outOfStock": "out of stock",
       "price": "Price",
       "retry": "Retry",
@@ -117,7 +117,7 @@
       "buy": "Buy Number",
       "insufficientFunds": "You need ₦{amount} more to buy this number — top up on the right to continue.",
       "errorGeneric": "Could not buy number",
-      "timeoutError": "Talktiyu is taking too long to respond — try again"
+      "timeoutError": "The server is taking too long to respond — try again"
     },
     "emailGenerate": {
       "title": "Generate an Email",
@@ -240,6 +240,86 @@
       "referralsSubtitle": "Invite friends and earn 5% of their top-ups, for life.",
       "transactionsTitle": "Transaction History",
       "transactionsSubtitle": "Every top-up, purchase, referral bonus, and refund on your wallet."
+    }
+  },
+  "auth": {
+    "common": {
+      "emailAddress": "Email Address",
+      "enterEmail": "Enter your email address",
+      "password": "Password",
+      "errorGeneric": "Something went wrong",
+      "orContinueWith": "or continue with",
+      "continueWithGoogle": "Continue with Google",
+      "continueWithApple": "Continue with Apple",
+      "appleComingSoon": "Apple sign-in is coming soon.",
+      "passwordsDontMatch": "Passwords don't match"
+    },
+    "trust": {
+      "secureTitle": "Your data is 100% secure",
+      "secureBody": "We never share your information.",
+      "otpTitle": "Instant OTPs",
+      "otpBody": "Receive codes in seconds.",
+      "supportTitle": "24/7 Support",
+      "supportBody": "We're always here to help."
+    },
+    "signup": {
+      "alreadyHaveAccount": "Already have an account?",
+      "logIn": "Log in",
+      "title": "Create your account",
+      "subtitle": "Join Reline and start receiving verification codes in seconds.",
+      "referralApplied": "✓ Referral code {code} applied",
+      "fullName": "Full Name",
+      "enterFullName": "Enter your full name",
+      "phoneNumber": "Phone Number",
+      "enterPhone": "Enter your phone number",
+      "createPassword": "Create a strong password",
+      "passwordHint": "Use at least 8 characters with a mix of letters, numbers & symbols.",
+      "confirmPassword": "Confirm Password",
+      "confirmYourPassword": "Confirm your password",
+      "agreeToTerms": "I agree to the",
+      "termsOfService": "Terms of Service",
+      "and": "and",
+      "privacyPolicy": "Privacy Policy",
+      "creatingAccount": "Creating account…",
+      "createAccount": "Create Account"
+    },
+    "login": {
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "title": "Welcome back",
+      "subtitle": "Sign in to fund your wallet and pick up where you left off.",
+      "enterPassword": "Enter your password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "verifiedNotice": "Your email is verified. You can log in now.",
+      "signingIn": "Signing in…",
+      "signIn": "Sign In"
+    },
+    "forgotPassword": {
+      "rememberedIt": "Remembered it?",
+      "logIn": "Log in",
+      "checkEmailTitle": "Check your email",
+      "checkEmailBody": "If an account exists for <bold>{email}</bold>, we've sent a link to reset your password. It expires in 30 minutes.",
+      "backToLogin": "Back to log in",
+      "title": "Forgot your password?",
+      "subtitle": "Enter the email on your account and we'll send you a link to reset it.",
+      "sending": "Sending…",
+      "sendResetLink": "Send reset link"
+    },
+    "resetPassword": {
+      "backToLogin": "Back to log in",
+      "passwordUpdatedTitle": "Password updated",
+      "takingYouToLogin": "Taking you to log in…",
+      "title": "Set a new password",
+      "subtitle": "Choose a strong password you haven't used before.",
+      "newPassword": "New Password",
+      "createPassword": "Create a strong password",
+      "passwordHint": "Use at least 8 characters with a mix of letters, numbers & symbols.",
+      "confirmNewPassword": "Confirm New Password",
+      "confirmYourNewPassword": "Confirm your new password",
+      "missingToken": "This reset link is missing its token. Request a new one.",
+      "updating": "Updating…",
+      "updatePassword": "Update password"
     }
   }
 }

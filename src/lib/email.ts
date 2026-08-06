@@ -82,6 +82,49 @@ export async function sendContactMessage(params: { name: string; email: string; 
   return { devMode: false as const };
 }
 
+export async function sendWelcomeEmail(to: string, params: { name: string | null; dashboardUrl: string }) {
+  const resend = getClient();
+  const from = process.env.EMAIL_FROM || "Reline <onboarding@resend.dev>";
+  const greeting = params.name ? `Hi ${escapeHtml(params.name)},` : "Hi there,";
+
+  if (!resend) {
+    console.log(`[email] RESEND_API_KEY not set. Welcome email skipped for ${to}.`);
+    return { devMode: true as const };
+  }
+
+  const { error } = await resend.emails.send({
+    from,
+    to,
+    subject: "Welcome to Reline — here's how to get started",
+    html: `
+      <div style="font-family: -apple-system, sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2 style="color: #0f172a;">Welcome to Reline 👋</h2>
+        <p style="color: #475569; line-height: 1.6;">${greeting}</p>
+        <p style="color: #475569; line-height: 1.6;">
+          Your account is ready. Reline gives you instant virtual phone numbers and temporary email
+          addresses for receiving SMS and email verification codes — no SIM card required. Here's how
+          to get going:
+        </p>
+        <ol style="color: #475569; line-height: 1.9; padding-left: 20px;">
+          <li><strong>Top up your wallet</strong> — fund it in Naira from your dashboard.</li>
+          <li><strong>Buy a number or generate an email</strong> — pick a service (WhatsApp, Telegram, Google, and more) and country.</li>
+          <li><strong>Receive your code</strong> — it lands in your dashboard in seconds, with a sound alert so you never miss it.</li>
+        </ol>
+        <a href="${params.dashboardUrl}"
+           style="display: inline-block; margin: 16px 0; padding: 12px 24px; background: #7c5cfc; color: white; text-decoration: none; border-radius: 10px; font-weight: 600;">
+          Go to my dashboard
+        </a>
+        <p style="color: #94a3b8; font-size: 13px;">
+          Questions? Just reply to this email — we're happy to help.
+        </p>
+      </div>
+    `,
+  });
+
+  if (error) throw new Error(error.message);
+  return { devMode: false as const };
+}
+
 export async function sendVerificationEmail(to: string, verifyUrl: string) {
   const resend = getClient();
   const from = process.env.EMAIL_FROM || "Reline <onboarding@resend.dev>";

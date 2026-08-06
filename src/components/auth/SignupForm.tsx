@@ -3,30 +3,21 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import MotionButton from "../motion/MotionButton";
 import AnimatedError from "../motion/AnimatedError";
 import CountryCodeSelect from "./CountryCodeSelect";
 import ThemeToggleButton from "../ThemeToggleButton";
 
-const TRUST_ITEMS = [
-  {
-    icon: <ShieldIcon />,
-    title: "Your data is 100% secure",
-    body: "We never share your information.",
-  },
-  {
-    icon: <BoltIcon />,
-    title: "Instant OTPs",
-    body: "Receive codes in seconds.",
-  },
-  {
-    icon: <HeadsetIcon />,
-    title: "24/7 Support",
-    body: "We're always here to help.",
-  },
-];
-
 export default function SignupForm() {
+  const t = useTranslations("auth.signup");
+  const tc = useTranslations("auth.common");
+  const tr = useTranslations("auth.trust");
+  const TRUST_ITEMS = [
+    { icon: <ShieldIcon />, title: tr("secureTitle"), body: tr("secureBody") },
+    { icon: <BoltIcon />, title: tr("otpTitle"), body: tr("otpBody") },
+    { icon: <HeadsetIcon />, title: tr("supportTitle"), body: tr("supportBody") },
+  ];
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -55,7 +46,7 @@ export default function SignupForm() {
     setError(null);
 
     if (password !== confirmPassword) {
-      setError("Passwords don't match");
+      setError(tc("passwordsDontMatch"));
       return;
     }
 
@@ -74,7 +65,7 @@ export default function SignupForm() {
       });
       const json = await res.json();
       if (!res.ok) {
-        setError(json.error || "Something went wrong");
+        setError(json.error || tc("errorGeneric"));
         return;
       }
       router.push("/dashboard");
@@ -88,39 +79,37 @@ export default function SignupForm() {
     <div className="flex min-h-screen flex-col bg-white px-6 py-10 dark:bg-ink-950 lg:px-16 lg:py-12">
       <div className="flex items-center justify-end gap-4 text-sm text-slate-500 dark:text-slate-400">
         <ThemeToggleButton />
-        Already have an account?{" "}
+        {t("alreadyHaveAccount")}{" "}
         <Link href="/login" className="ml-1 font-medium text-violet-600 hover:underline dark:text-violet-300">
-          Log in
+          {t("logIn")}
         </Link>
       </div>
 
       <div className="mx-auto w-full max-w-md flex-1 py-8">
         <h1 className="font-display text-3xl font-700 tracking-tight text-slate-900 dark:text-paper-100">
-          Create your account
+          {t("title")}
         </h1>
-        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-          Join Reline and start receiving verification codes in seconds.
-        </p>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{t("subtitle")}</p>
         {referralCode && (
           <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300">
-            ✓ Referral code {referralCode} applied
+            {t("referralApplied", { code: referralCode })}
           </p>
         )}
 
         <form onSubmit={onSubmit} className="mt-8 space-y-5">
-          <Field label="Full Name">
+          <Field label={t("fullName")}>
             <div className="flex items-center gap-2 rounded-xl border border-slate-200 px-3.5 py-3 focus-within:border-violet-500 dark:border-ink-700">
               <UserIcon />
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your full name"
+                placeholder={t("enterFullName")}
                 className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-paper-100 dark:placeholder:text-slate-500"
               />
             </div>
           </Field>
 
-          <Field label="Email Address">
+          <Field label={tc("emailAddress")}>
             <div className="flex items-center gap-2 rounded-xl border border-slate-200 px-3.5 py-3 focus-within:border-violet-500 dark:border-ink-700">
               <MailIcon />
               <input
@@ -128,13 +117,13 @@ export default function SignupForm() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
+                placeholder={tc("enterEmail")}
                 className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-paper-100 dark:placeholder:text-slate-500"
               />
             </div>
           </Field>
 
-          <Field label="Phone Number">
+          <Field label={t("phoneNumber")}>
             <div className="flex items-center rounded-xl border border-slate-200 pl-3.5 focus-within:border-violet-500 dark:border-ink-700">
               <PhoneIcon />
               <CountryCodeSelect value={countryCode} onChange={setCountryCode} />
@@ -142,13 +131,13 @@ export default function SignupForm() {
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="Enter your phone number"
+                placeholder={t("enterPhone")}
                 className="w-full px-3 py-3 bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-paper-100 dark:placeholder:text-slate-500"
               />
             </div>
           </Field>
 
-          <Field label="Password">
+          <Field label={tc("password")}>
             <div className="flex items-center gap-2 rounded-xl border border-slate-200 px-3.5 py-3 focus-within:border-violet-500 dark:border-ink-700">
               <LockIcon />
               <input
@@ -157,19 +146,17 @@ export default function SignupForm() {
                 minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Create a strong password"
+                placeholder={t("createPassword")}
                 className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-paper-100 dark:placeholder:text-slate-500"
               />
               <button type="button" onClick={() => setShowPassword((v) => !v)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
                 {showPassword ? <EyeOffIcon /> : <EyeIcon />}
               </button>
             </div>
-            <p className="mt-1.5 text-xs text-slate-400">
-              Use at least 8 characters with a mix of letters, numbers &amp; symbols.
-            </p>
+            <p className="mt-1.5 text-xs text-slate-400">{t("passwordHint")}</p>
           </Field>
 
-          <Field label="Confirm Password">
+          <Field label={t("confirmPassword")}>
             <div className="flex items-center gap-2 rounded-xl border border-slate-200 px-3.5 py-3 focus-within:border-violet-500 dark:border-ink-700">
               <LockIcon />
               <input
@@ -177,7 +164,7 @@ export default function SignupForm() {
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm your password"
+                placeholder={t("confirmYourPassword")}
                 className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-paper-100 dark:placeholder:text-slate-500"
               />
               <button type="button" onClick={() => setShowConfirm((v) => !v)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
@@ -194,21 +181,21 @@ export default function SignupForm() {
               className="mt-0.5 h-4 w-4 rounded border-slate-300 text-violet-600 focus-ring dark:border-ink-700"
             />
             <span>
-              I agree to the{" "}
+              {t("agreeToTerms")}{" "}
               <Link
                 href="/terms"
                 target="_blank"
                 className="text-violet-600 hover:underline dark:text-violet-300"
               >
-                Terms of Service
+                {t("termsOfService")}
               </Link>{" "}
-              and{" "}
+              {t("and")}{" "}
               <Link
                 href="/privacy"
                 target="_blank"
                 className="text-violet-600 hover:underline dark:text-violet-300"
               >
-                Privacy Policy
+                {t("privacyPolicy")}
               </Link>
             </span>
           </label>
@@ -220,13 +207,13 @@ export default function SignupForm() {
             disabled={loading || !agreed}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-violet-600 py-3.5 font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50 focus-ring"
           >
-            {loading ? "Creating account…" : "Create Account"}
+            {loading ? t("creatingAccount") : t("createAccount")}
             {!loading && <ArrowRightIcon />}
           </MotionButton>
 
           <div className="flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
             <span className="h-px flex-1 bg-slate-100 dark:bg-ink-800" />
-            or continue with
+            {tc("orContinueWith")}
             <span className="h-px flex-1 bg-slate-100 dark:bg-ink-800" />
           </div>
 
@@ -236,15 +223,15 @@ export default function SignupForm() {
               className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 focus-ring dark:border-ink-700 dark:text-slate-300 dark:hover:bg-ink-800"
             >
               <GoogleLogo />
-              Continue with Google
+              {tc("continueWithGoogle")}
             </a>
             <button
               type="button"
-              onClick={() => setSsoNotice("Apple sign-in is coming soon.")}
+              onClick={() => setSsoNotice(tc("appleComingSoon"))}
               className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 focus-ring dark:border-ink-700 dark:text-slate-300 dark:hover:bg-ink-800"
             >
               <AppleLogo />
-              Continue with Apple
+              {tc("continueWithApple")}
             </button>
           </div>
           <AnimatedError message={ssoNotice} className="text-slate-400" />

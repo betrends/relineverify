@@ -6,6 +6,8 @@ import { createSessionToken, setSessionCookie } from "@/lib/session";
 import { rateLimitOrNull } from "@/lib/rateLimit";
 import { issueVerificationEmail } from "@/lib/emailVerification";
 import { findReferrerByCode } from "@/lib/referral";
+import { isDeliverableEmailDomain } from "@/lib/validateEmailDomain";
+import { sendWelcomeEmail } from "@/lib/email";
 
 const schema = z.object({
   name: z.string().trim().min(1).max(100).optional(),
@@ -37,6 +39,18 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Reject domains that can't actually receive mail (typos, made-up
+  // domains, known disposable-email providers) before creating the
+  // account — catches most junk signups without needing a paid
+  // mailbox-verification API.
+  const deliverable = await isDeliverableEmailDomain(email);
+  if (!deliverable) {
+    return NextResponse.json(
+      { error: "That email address doesn't look like it can receive mail — please use a real, active email" },
+      { status: 400 }
+    );
+  }
+
   const referrer = parsed.data.referralCode ? await findReferrerByCode(parsed.data.referralCode) : null;
 
   const passwordHash = await bcrypt.hash(parsed.data.password, 10);
@@ -56,6 +70,11 @@ export async function POST(req: NextRequest) {
 
   const appUrl = process.env.APP_URL || req.nextUrl.origin;
   await issueVerificationEmail(user.id, user.email, appUrl);
+  try {
+    await sendWelcomeEmail(user.email, { name: user.name, dashboardUrl: `${appUrl}/dashboard` });
+  } catch (err) {
+    console.error("[signup] failed to send welcome email:", err);
+  }
 
   return NextResponse.json({ email: user.email });
 }

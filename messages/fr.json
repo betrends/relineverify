@@ -108,8 +108,8 @@
       "selectService": "Choisir un service ou une plateforme",
       "searchCountries": "Rechercher des pays…",
       "searchServices": "Rechercher des services…",
-      "fetchingCountries": "Récupération de la disponibilité en direct depuis Talktiyu — le premier chargement peut prendre jusqu'à 30s.",
-      "fetchingServices": "Récupération des prix en direct depuis Talktiyu — le premier chargement peut prendre jusqu'à 30s.",
+      "fetchingCountries": "Vérification de la disponibilité en direct — le premier chargement peut prendre jusqu'à 30s.",
+      "fetchingServices": "Vérification des prix en direct — le premier chargement peut prendre jusqu'à 30s.",
       "outOfStock": "en rupture de stock",
       "price": "Prix",
       "retry": "Réessayer",
@@ -117,7 +117,7 @@
       "buy": "Acheter le numéro",
       "insufficientFunds": "Il vous manque ₦{amount} pour acheter ce numéro — rechargez à droite pour continuer.",
       "errorGeneric": "Impossible d'acheter le numéro",
-      "timeoutError": "Talktiyu met trop de temps à répondre — réessayez"
+      "timeoutError": "Le serveur met trop de temps à répondre — réessayez"
     },
     "emailGenerate": {
       "title": "Générer un email",
@@ -240,6 +240,86 @@
       "referralsSubtitle": "Invitez des amis et gagnez 5% de leurs recharges, à vie.",
       "transactionsTitle": "Historique des transactions",
       "transactionsSubtitle": "Chaque recharge, achat, bonus de parrainage et remboursement de votre portefeuille."
+    }
+  },
+  "auth": {
+    "common": {
+      "emailAddress": "Adresse email",
+      "enterEmail": "Entrez votre adresse email",
+      "password": "Mot de passe",
+      "errorGeneric": "Une erreur s'est produite",
+      "orContinueWith": "ou continuer avec",
+      "continueWithGoogle": "Continuer avec Google",
+      "continueWithApple": "Continuer avec Apple",
+      "appleComingSoon": "La connexion Apple arrive bientôt.",
+      "passwordsDontMatch": "Les mots de passe ne correspondent pas"
+    },
+    "trust": {
+      "secureTitle": "Vos données sont 100% sécurisées",
+      "secureBody": "Nous ne partageons jamais vos informations.",
+      "otpTitle": "OTP instantanés",
+      "otpBody": "Recevez les codes en quelques secondes.",
+      "supportTitle": "Support 24/7",
+      "supportBody": "Nous sommes toujours là pour vous aider."
+    },
+    "signup": {
+      "alreadyHaveAccount": "Vous avez déjà un compte ?",
+      "logIn": "Connexion",
+      "title": "Créez votre compte",
+      "subtitle": "Rejoignez Reline et commencez à recevoir des codes de vérification en quelques secondes.",
+      "referralApplied": "✓ Code de parrainage {code} appliqué",
+      "fullName": "Nom complet",
+      "enterFullName": "Entrez votre nom complet",
+      "phoneNumber": "Numéro de téléphone",
+      "enterPhone": "Entrez votre numéro de téléphone",
+      "createPassword": "Créez un mot de passe fort",
+      "passwordHint": "Utilisez au moins 8 caractères avec un mélange de lettres, chiffres et symboles.",
+      "confirmPassword": "Confirmer le mot de passe",
+      "confirmYourPassword": "Confirmez votre mot de passe",
+      "agreeToTerms": "J'accepte les",
+      "termsOfService": "Conditions d'utilisation",
+      "and": "et",
+      "privacyPolicy": "Politique de confidentialité",
+      "creatingAccount": "Création du compte…",
+      "createAccount": "Créer un compte"
+    },
+    "login": {
+      "noAccount": "Vous n'avez pas de compte ?",
+      "signUp": "S'inscrire",
+      "title": "Bon retour",
+      "subtitle": "Connectez-vous pour recharger votre portefeuille et reprendre où vous en étiez.",
+      "enterPassword": "Entrez votre mot de passe",
+      "rememberMe": "Se souvenir de moi",
+      "forgotPassword": "Mot de passe oublié ?",
+      "verifiedNotice": "Votre email est vérifié. Vous pouvez maintenant vous connecter.",
+      "signingIn": "Connexion…",
+      "signIn": "Se connecter"
+    },
+    "forgotPassword": {
+      "rememberedIt": "Vous vous en souvenez ?",
+      "logIn": "Connexion",
+      "checkEmailTitle": "Vérifiez votre email",
+      "checkEmailBody": "Si un compte existe pour <bold>{email}</bold>, nous avons envoyé un lien pour réinitialiser votre mot de passe. Il expire dans 30 minutes.",
+      "backToLogin": "Retour à la connexion",
+      "title": "Mot de passe oublié ?",
+      "subtitle": "Entrez l'email de votre compte et nous vous enverrons un lien pour le réinitialiser.",
+      "sending": "Envoi…",
+      "sendResetLink": "Envoyer le lien de réinitialisation"
+    },
+    "resetPassword": {
+      "backToLogin": "Retour à la connexion",
+      "passwordUpdatedTitle": "Mot de passe mis à jour",
+      "takingYouToLogin": "Redirection vers la connexion…",
+      "title": "Définir un nouveau mot de passe",
+      "subtitle": "Choisissez un mot de passe fort que vous n'avez jamais utilisé.",
+      "newPassword": "Nouveau mot de passe",
+      "createPassword": "Créez un mot de passe fort",
+      "passwordHint": "Utilisez au moins 8 caractères avec un mélange de lettres, chiffres et symboles.",
+      "confirmNewPassword": "Confirmer le nouveau mot de passe",
+      "confirmYourNewPassword": "Confirmez votre nouveau mot de passe",
+      "missingToken": "Ce lien de réinitialisation n'a pas de jeton. Demandez-en un nouveau.",
+      "updating": "Mise à jour…",
+      "updatePassword": "Mettre à jour le mot de passe"
     }
   }
 }

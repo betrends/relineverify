@@ -108,8 +108,8 @@
       "selectService": "Selecione um serviço ou plataforma",
       "searchCountries": "Pesquisar países…",
       "searchServices": "Pesquisar serviços…",
-      "fetchingCountries": "Buscando disponibilidade ao vivo na Talktiyu — o primeiro carregamento pode levar até 30s.",
-      "fetchingServices": "Buscando preços ao vivo na Talktiyu — o primeiro carregamento pode levar até 30s.",
+      "fetchingCountries": "Verificando disponibilidade ao vivo — o primeiro carregamento pode levar até 30s.",
+      "fetchingServices": "Verificando preços ao vivo — o primeiro carregamento pode levar até 30s.",
       "outOfStock": "esgotado",
       "price": "Preço",
       "retry": "Tentar novamente",
@@ -117,7 +117,7 @@
       "buy": "Comprar número",
       "insufficientFunds": "Você precisa de mais ₦{amount} para comprar este número — recarregue à direita para continuar.",
       "errorGeneric": "Não foi possível comprar o número",
-      "timeoutError": "A Talktiyu está demorando demais para responder — tente novamente"
+      "timeoutError": "O servidor está demorando demais para responder — tente novamente"
     },
     "emailGenerate": {
       "title": "Gerar um email",
@@ -240,6 +240,86 @@
       "referralsSubtitle": "Convide amigos e ganhe 5% das recargas deles, para sempre.",
       "transactionsTitle": "Histórico de transações",
       "transactionsSubtitle": "Cada recarga, compra, bônus de indicação e reembolso da sua carteira."
+    }
+  },
+  "auth": {
+    "common": {
+      "emailAddress": "Endereço de email",
+      "enterEmail": "Digite seu endereço de email",
+      "password": "Senha",
+      "errorGeneric": "Algo deu errado",
+      "orContinueWith": "ou continue com",
+      "continueWithGoogle": "Continuar com Google",
+      "continueWithApple": "Continuar com Apple",
+      "appleComingSoon": "O login com Apple chega em breve.",
+      "passwordsDontMatch": "As senhas não coincidem"
+    },
+    "trust": {
+      "secureTitle": "Seus dados estão 100% seguros",
+      "secureBody": "Nunca compartilhamos suas informações.",
+      "otpTitle": "OTPs instantâneos",
+      "otpBody": "Receba códigos em segundos.",
+      "supportTitle": "Suporte 24/7",
+      "supportBody": "Estamos sempre aqui para ajudar."
+    },
+    "signup": {
+      "alreadyHaveAccount": "Já tem uma conta?",
+      "logIn": "Entrar",
+      "title": "Crie sua conta",
+      "subtitle": "Junte-se à Reline e comece a receber códigos de verificação em segundos.",
+      "referralApplied": "✓ Código de indicação {code} aplicado",
+      "fullName": "Nome completo",
+      "enterFullName": "Digite seu nome completo",
+      "phoneNumber": "Número de telefone",
+      "enterPhone": "Digite seu número de telefone",
+      "createPassword": "Crie uma senha forte",
+      "passwordHint": "Use pelo menos 8 caracteres com uma mistura de letras, números e símbolos.",
+      "confirmPassword": "Confirmar senha",
+      "confirmYourPassword": "Confirme sua senha",
+      "agreeToTerms": "Eu concordo com os",
+      "termsOfService": "Termos de Serviço",
+      "and": "e",
+      "privacyPolicy": "Política de Privacidade",
+      "creatingAccount": "Criando conta…",
+      "createAccount": "Criar conta"
+    },
+    "login": {
+      "noAccount": "Não tem uma conta?",
+      "signUp": "Cadastre-se",
+      "title": "Bem-vindo de volta",
+      "subtitle": "Entre para recarregar sua carteira e continuar de onde parou.",
+      "enterPassword": "Digite sua senha",
+      "rememberMe": "Lembrar de mim",
+      "forgotPassword": "Esqueceu a senha?",
+      "verifiedNotice": "Seu email foi verificado. Você já pode entrar.",
+      "signingIn": "Entrando…",
+      "signIn": "Entrar"
+    },
+    "forgotPassword": {
+      "rememberedIt": "Lembrou dela?",
+      "logIn": "Entrar",
+      "checkEmailTitle": "Verifique seu email",
+      "checkEmailBody": "Se existir uma conta para <bold>{email}</bold>, enviamos um link para redefinir sua senha. Ele expira em 30 minutos.",
+      "backToLogin": "Voltar para entrar",
+      "title": "Esqueceu sua senha?",
+      "subtitle": "Digite o email da sua conta e enviaremos um link para redefini-la.",
+      "sending": "Enviando…",
+      "sendResetLink": "Enviar link de redefinição"
+    },
+    "resetPassword": {
+      "backToLogin": "Voltar para entrar",
+      "passwordUpdatedTitle": "Senha atualizada",
+      "takingYouToLogin": "Levando você para o login…",
+      "title": "Defina uma nova senha",
+      "subtitle": "Escolha uma senha forte que você ainda não usou.",
+      "newPassword": "Nova senha",
+      "createPassword": "Crie uma senha forte",
+      "passwordHint": "Use pelo menos 8 caracteres com uma mistura de letras, números e símbolos.",
+      "confirmNewPassword": "Confirmar nova senha",
+      "confirmYourNewPassword": "Confirme sua nova senha",
+      "missingToken": "Este link de redefinição está sem token. Solicite um novo.",
+      "updating": "Atualizando…",
+      "updatePassword": "Atualizar senha"
     }
   }
 }

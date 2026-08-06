@@ -12,3 +12,5 @@ dev.db
 
 # Sentry CLI auth token, generated if the setup wizard is ever run
 .env.sentry-build-plugin
+.vercel
+.env*

@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import MotionButton from "../motion/MotionButton";
 import AnimatedError from "../motion/AnimatedError";
 import ThemeToggleButton from "../ThemeToggleButton";
 
 export default function ForgotPasswordForm() {
+  const t = useTranslations("auth.forgotPassword");
+  const tc = useTranslations("auth.common");
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -24,7 +27,7 @@ export default function ForgotPasswordForm() {
       });
       if (!res.ok) {
         const json = await res.json().catch(() => null);
-        setError(json?.error || "Something went wrong");
+        setError(json?.error || tc("errorGeneric"));
         return;
       }
       setSent(true);
@@ -37,9 +40,9 @@ export default function ForgotPasswordForm() {
     <div className="flex min-h-screen flex-col bg-white px-6 py-10 dark:bg-ink-950 lg:px-16 lg:py-12">
       <div className="flex items-center justify-end gap-4 text-sm text-slate-500 dark:text-slate-400">
         <ThemeToggleButton />
-        Remembered it?{" "}
+        {t("rememberedIt")}{" "}
         <Link href="/login" className="ml-1 font-medium text-violet-600 hover:underline dark:text-violet-300">
-          Log in
+          {t("logIn")}
         </Link>
       </div>
 
@@ -50,30 +53,32 @@ export default function ForgotPasswordForm() {
               <CheckIcon />
             </span>
             <h1 className="mt-4 font-display text-3xl font-700 tracking-tight text-slate-900 dark:text-paper-100">
-              Check your email
+              {t("checkEmailTitle")}
             </h1>
             <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-              If an account exists for <span className="font-medium text-slate-700 dark:text-slate-300">{email}</span>,
-              we&apos;ve sent a link to reset your password. It expires in 30 minutes.
+              {t.rich("checkEmailBody", {
+                email,
+                bold: (chunks) => (
+                  <span className="font-medium text-slate-700 dark:text-slate-300">{chunks}</span>
+                ),
+              })}
             </p>
             <Link
               href="/login"
               className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-violet-600 py-3.5 font-medium text-white transition-opacity hover:opacity-90 focus-ring"
             >
-              Back to log in
+              {t("backToLogin")}
             </Link>
           </>
         ) : (
           <>
             <h1 className="font-display text-3xl font-700 tracking-tight text-slate-900 dark:text-paper-100">
-              Forgot your password?
+              {t("title")}
             </h1>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-              Enter the email on your account and we&apos;ll send you a link to reset it.
-            </p>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{t("subtitle")}</p>
 
             <form onSubmit={onSubmit} className="mt-8 space-y-5">
-              <Field label="Email Address">
+              <Field label={tc("emailAddress")}>
                 <div className="flex items-center gap-2 rounded-xl border border-slate-200 px-3.5 py-3 focus-within:border-violet-500 dark:border-ink-700">
                   <MailIcon />
                   <input
@@ -81,7 +86,7 @@ export default function ForgotPasswordForm() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email address"
+                    placeholder={tc("enterEmail")}
                     className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-paper-100 dark:placeholder:text-slate-500"
                   />
                 </div>
@@ -94,7 +99,7 @@ export default function ForgotPasswordForm() {
                 disabled={loading}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-violet-600 py-3.5 font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50 focus-ring"
               >
-                {loading ? "Sending…" : "Send reset link"}
+                {loading ? t("sending") : t("sendResetLink")}
                 {!loading && <ArrowRightIcon />}
               </MotionButton>
             </form>

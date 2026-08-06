@@ -108,8 +108,8 @@
       "selectService": "Selecciona un servicio o plataforma",
       "searchCountries": "Buscar países…",
       "searchServices": "Buscar servicios…",
-      "fetchingCountries": "Obteniendo disponibilidad en vivo desde Talktiyu — la primera carga puede tardar hasta 30s.",
-      "fetchingServices": "Obteniendo precios en vivo desde Talktiyu — la primera carga puede tardar hasta 30s.",
+      "fetchingCountries": "Comprobando disponibilidad en vivo — la primera carga puede tardar hasta 30s.",
+      "fetchingServices": "Comprobando precios en vivo — la primera carga puede tardar hasta 30s.",
       "outOfStock": "agotado",
       "price": "Precio",
       "retry": "Reintentar",
@@ -117,7 +117,7 @@
       "buy": "Comprar número",
       "insufficientFunds": "Necesitas ₦{amount} más para comprar este número — recarga a la derecha para continuar.",
       "errorGeneric": "No se pudo comprar el número",
-      "timeoutError": "Talktiyu está tardando demasiado en responder — inténtalo de nuevo"
+      "timeoutError": "El servidor está tardando demasiado en responder — inténtalo de nuevo"
     },
     "emailGenerate": {
       "title": "Generar un correo",
@@ -240,6 +240,86 @@
       "referralsSubtitle": "Invita amigos y gana el 5% de sus recargas, de por vida.",
       "transactionsTitle": "Historial de transacciones",
       "transactionsSubtitle": "Cada recarga, compra, bono de referido y reembolso de tu monedero."
+    }
+  },
+  "auth": {
+    "common": {
+      "emailAddress": "Dirección de correo",
+      "enterEmail": "Ingresa tu dirección de correo",
+      "password": "Contraseña",
+      "errorGeneric": "Algo salió mal",
+      "orContinueWith": "o continúa con",
+      "continueWithGoogle": "Continuar con Google",
+      "continueWithApple": "Continuar con Apple",
+      "appleComingSoon": "El inicio de sesión con Apple llega pronto.",
+      "passwordsDontMatch": "Las contraseñas no coinciden"
+    },
+    "trust": {
+      "secureTitle": "Tus datos están 100% seguros",
+      "secureBody": "Nunca compartimos tu información.",
+      "otpTitle": "OTP instantáneos",
+      "otpBody": "Recibe códigos en segundos.",
+      "supportTitle": "Soporte 24/7",
+      "supportBody": "Siempre estamos aquí para ayudarte."
+    },
+    "signup": {
+      "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+      "logIn": "Iniciar sesión",
+      "title": "Crea tu cuenta",
+      "subtitle": "Únete a Reline y empieza a recibir códigos de verificación en segundos.",
+      "referralApplied": "✓ Código de referido {code} aplicado",
+      "fullName": "Nombre completo",
+      "enterFullName": "Ingresa tu nombre completo",
+      "phoneNumber": "Número de teléfono",
+      "enterPhone": "Ingresa tu número de teléfono",
+      "createPassword": "Crea una contraseña segura",
+      "passwordHint": "Usa al menos 8 caracteres con una mezcla de letras, números y símbolos.",
+      "confirmPassword": "Confirmar contraseña",
+      "confirmYourPassword": "Confirma tu contraseña",
+      "agreeToTerms": "Acepto los",
+      "termsOfService": "Términos de servicio",
+      "and": "y",
+      "privacyPolicy": "Política de privacidad",
+      "creatingAccount": "Creando cuenta…",
+      "createAccount": "Crear cuenta"
+    },
+    "login": {
+      "noAccount": "¿No tienes una cuenta?",
+      "signUp": "Regístrate",
+      "title": "Hola de nuevo",
+      "subtitle": "Inicia sesión para recargar tu monedero y continuar donde lo dejaste.",
+      "enterPassword": "Ingresa tu contraseña",
+      "rememberMe": "Recuérdame",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "verifiedNotice": "Tu correo está verificado. Ya puedes iniciar sesión.",
+      "signingIn": "Iniciando sesión…",
+      "signIn": "Iniciar sesión"
+    },
+    "forgotPassword": {
+      "rememberedIt": "¿Ya la recordaste?",
+      "logIn": "Iniciar sesión",
+      "checkEmailTitle": "Revisa tu correo",
+      "checkEmailBody": "Si existe una cuenta para <bold>{email}</bold>, te hemos enviado un enlace para restablecer tu contraseña. Vence en 30 minutos.",
+      "backToLogin": "Volver a iniciar sesión",
+      "title": "¿Olvidaste tu contraseña?",
+      "subtitle": "Ingresa el correo de tu cuenta y te enviaremos un enlace para restablecerla.",
+      "sending": "Enviando…",
+      "sendResetLink": "Enviar enlace de restablecimiento"
+    },
+    "resetPassword": {
+      "backToLogin": "Volver a iniciar sesión",
+      "passwordUpdatedTitle": "Contraseña actualizada",
+      "takingYouToLogin": "Llevándote al inicio de sesión…",
+      "title": "Establece una nueva contraseña",
+      "subtitle": "Elige una contraseña segura que no hayas usado antes.",
+      "newPassword": "Nueva contraseña",
+      "createPassword": "Crea una contraseña segura",
+      "passwordHint": "Usa al menos 8 caracteres con una mezcla de letras, números y símbolos.",
+      "confirmNewPassword": "Confirmar nueva contraseña",
+      "confirmYourNewPassword": "Confirma tu nueva contraseña",
+      "missingToken": "Este enlace de restablecimiento no tiene su token. Solicita uno nuevo.",
+      "updating": "Actualizando…",
+      "updatePassword": "Actualizar contraseña"
     }
   }
 }
