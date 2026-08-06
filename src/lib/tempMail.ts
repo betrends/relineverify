@@ -31,8 +31,18 @@ async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
 }
 
 async function pickDomain(): Promise<string> {
-  const res = await fetch(`${BASE_URL}/domains`, { cache: "no-store" });
-  if (!res.ok) throw new TempMailError("Could not reach the email provider");
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}/domains`, { cache: "no-store" });
+  } catch (err) {
+    console.error("[tempMail] network error reaching mail.tm:", err);
+    throw new TempMailError("Could not reach the email provider");
+  }
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    console.error(`[tempMail] mail.tm /domains returned ${res.status}: ${body.slice(0, 300)}`);
+    throw new TempMailError("Could not reach the email provider");
+  }
   const json = await res.json();
   const domain = json?.["hydra:member"]?.[0]?.domain;
   if (!domain) throw new TempMailError("No email domains available right now");
