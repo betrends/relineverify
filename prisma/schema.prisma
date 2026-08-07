@@ -8,21 +8,21 @@ generator client {
 }
 
 model User {
-  id            String        @id @default(cuid())
-  name          String?
-  phone         String?
-  email         String        @unique
-  passwordHash  String?
-  googleId      String?       @unique
-  avatarUrl     String?
-  emailVerifiedAt DateTime?
-  walletBalance Int           @default(0)
-  createdAt     DateTime      @default(now())
-  orders        Order[]
-  transactions  Transaction[]
-  resetTokens   PasswordResetToken[]
+  id                 String                   @id @default(cuid())
+  name               String?
+  phone              String?
+  email              String                   @unique
+  passwordHash       String?
+  googleId           String?                  @unique
+  avatarUrl          String?
+  emailVerifiedAt    DateTime?
+  walletBalance      Int                      @default(0)
+  createdAt          DateTime                 @default(now())
+  orders             Order[]
+  transactions       Transaction[]
+  resetTokens        PasswordResetToken[]
   verificationTokens EmailVerificationToken[]
-  generatedEmails GeneratedEmail[]
+  generatedEmails    GeneratedEmail[]
 
   // Referral program: this user's own shareable code, who referred them (if
   // anyone), and the earnings they've collected as a referrer.
@@ -84,16 +84,16 @@ model Transaction {
 }
 
 model GeneratedEmail {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  address      String   @unique
-  mailPassword String // temp-mail provider account password — server-only, never returned to the client
-  costCharged  Int
-  emailText    String?
-  status       String // "pending" | "received" | "expired"
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  address         String   @unique
+  providerInboxId String // Mailslurp inbox ID used to poll for incoming mail — server-only, never returned to the client
+  costCharged     Int
+  emailText       String?
+  status          String // "pending" | "received" | "expired"
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@index([userId])
 }

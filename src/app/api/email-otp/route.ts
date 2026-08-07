@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       data: {
         userId: session.userId,
         address: inbox.address,
-        mailPassword: inbox.password,
+        providerInboxId: inbox.inboxId,
         costCharged: EMAIL_COST,
         status: "pending",
       },

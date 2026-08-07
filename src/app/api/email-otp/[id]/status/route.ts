@@ -24,7 +24,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 
   if (record.status !== "pending") {
-    const { mailPassword, ...safe } = record;
+    const { providerInboxId, ...safe } = record;
     return NextResponse.json({ email: safe });
   }
 
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 
   try {
-    const result = await checkInbox(record.address, record.mailPassword);
+    const result = await checkInbox(record.address, record.providerInboxId);
     if (result.received) {
       const updated = await prisma.generatedEmail.update({
         where: { id: record.id },
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     // Transient upstream error — report current known state, client will retry.
   }
 
-  const { mailPassword, ...safe } = record;
+  const { providerInboxId, ...safe } = record;
   return NextResponse.json({ email: safe });
 }
 

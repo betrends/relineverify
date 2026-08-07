@@ -17,7 +17,7 @@ const SELECT = {
   updatedAt: true,
 } as const;
 
-// Requests a fresh code on the SAME inbox (no new mail.tm account) — only
+// Requests a fresh code on the SAME inbox (no new provider inbox) — only
 // once the previous code has actually gone stale, and only on an inbox
 // we've proven works (a code has landed there before).
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         emailText: null,
         costCharged: REGENERATE_COST,
         // Restarts the wait-for-code window for this attempt —
-        // the original address/mailPassword are untouched.
+        // the original address/providerInboxId are untouched.
         createdAt: new Date(),
       },
     });
