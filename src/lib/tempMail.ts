@@ -1,20 +1,32 @@
-import crypto from "crypto";
-
 /**
- * Client for mail.tm — a free public temporary-inbox API. This is a
- * stand-in provider: no commercial SLA, and some big mail providers
- * filter known temp-mail domains, so delivery isn't guaranteed. Swap
- * this module for a commercial provider (e.g. MailSlurp) later without
- * touching the routes that call it — same pattern as lib/korapay.ts.
+ * Client for Guerrilla Mail — a free, public, unauthenticated temp-inbox
+ * API. Third provider tried here: mail.tm started 500ing specifically for
+ * requests from Vercel's servers (likely cloud-IP blocking), and MailSlurp
+ * (a commercial provider, chosen to sidestep that class of problem) turned
+ * out to be unreachable for this account/region regardless of device,
+ * browser, or network — so its signup could never be completed to get an
+ * API key. Guerrilla Mail needs no key at all, so that failure mode
+ * doesn't apply, but being free and public it carries the same
+ * cloud-IP-blocking risk mail.tm had — this was verified reachable from a
+ * plain server-side fetch before shipping.
+ *
+ * Session identity: their docs say to track the session via the
+ * PHPSESSID cookie, but that didn't actually work in testing (an inbox
+ * created in one request came back empty when checked with that cookie
+ * in a later request). Their JSON responses also include a `sid_token`
+ * field that works as a query param on every subsequent call — that's
+ * what's used here, stored in the `providerInboxId` column.
+ *
+ * Docs: https://www.guerrillamail.com/GuerrillaMailAPI.html
  */
 
-const BASE_URL = "https://api.mail.tm";
+const BASE_URL = "https://api.guerrillamail.com/ajax.php";
 
 export class TempMailError extends Error {}
 
-// Thrown when the provider rejects the inbox's credentials outright (account
-// deleted/disabled) — distinct from a transient network/5xx failure, so
-// callers can stop polling and close it out immediately instead of waiting.
+// Thrown when the provider rejects the inbox outright — distinct from a
+// transient network/5xx failure, so callers can stop polling and close it
+// out immediately instead of waiting.
 export class TempMailAuthError extends TempMailError {}
 
 async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
@@ -24,117 +36,87 @@ async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
       return await fn();
     } catch (err) {
       lastErr = err;
+      if (err instanceof TempMailAuthError) throw err; // not retryable
       if (i < attempts - 1) await new Promise((r) => setTimeout(r, 400 * (i + 1)));
     }
   }
   throw lastErr;
 }
 
-async function pickDomain(): Promise<string> {
-  let res: Response;
-  try {
-    res = await fetch(`${BASE_URL}/domains`, { cache: "no-store" });
-  } catch (err) {
-    console.error("[tempMail] network error reaching mail.tm:", err);
-    throw new TempMailError("Could not reach the email provider");
-  }
-  if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    console.error(`[tempMail] mail.tm /domains returned ${res.status}: ${body.slice(0, 300)}`);
-    throw new TempMailError("Could not reach the email provider");
-  }
-  const json = await res.json();
-  const domain = json?.["hydra:member"]?.[0]?.domain;
-  if (!domain) throw new TempMailError("No email domains available right now");
-  return domain;
-}
-
-export async function createInbox(): Promise<{ address: string; password: string }> {
+export async function createInbox(): Promise<{ address: string; inboxId: string }> {
   return withRetry(async () => {
-    const domain = await pickDomain();
-    // No dot in the local part: mail.tm silently strips dots server-side,
-    // so an address we construct with one never matches what actually gets
-    // registered — every later auth call 401s against an inbox that "exists"
-    // but under a different address than the one we're using.
-    const local = crypto.randomBytes(8).toString("hex");
-    const address = `reline${local}@${domain}`;
-    const password = crypto.randomBytes(16).toString("hex");
-
-    const res = await fetch(`${BASE_URL}/accounts`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ address, password }),
-    });
-    if (!res.ok) throw new TempMailError("Could not generate an email address");
-    const created = await res.json();
-
-    // Trust whatever address the provider actually confirmed, in case of
-    // further normalization beyond dot-stripping.
-    return { address: created.address || address, password };
+    let res: Response;
+    try {
+      res = await fetch(`${BASE_URL}?f=get_email_address`, { cache: "no-store" });
+    } catch (err) {
+      console.error("[tempMail] network error creating inbox:", err);
+      throw new TempMailError("Could not reach the email provider");
+    }
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error(`[tempMail] get_email_address returned ${res.status}: ${body.slice(0, 300)}`);
+      throw new TempMailError("Could not reach the email provider");
+    }
+    const json = await res.json().catch(() => null);
+    const address = json?.email_addr as string | undefined;
+    const sidToken = json?.sid_token as string | undefined;
+    if (!sidToken || !address) {
+      console.error("[tempMail] get_email_address missing sid_token or address:", JSON.stringify(json));
+      throw new TempMailError("Could not generate an email address");
+    }
+    return { address, inboxId: sidToken };
   });
-}
-
-// mail.tm tokens are valid well beyond our polling window — fetching a new
-// one on every poll (every few seconds, for up to an hour) hammers their
-// auth endpoint and reads as abuse, which is what gets accounts frozen.
-// Cache per-address and only refresh when actually stale or rejected.
-const TOKEN_TTL_MS = 5 * 60 * 1000;
-const tokenCache = new Map<string, { token: string; fetchedAt: number }>();
-
-async function getToken(address: string, password: string, forceRefresh = false): Promise<string> {
-  const cached = tokenCache.get(address);
-  if (!forceRefresh && cached && Date.now() - cached.fetchedAt < TOKEN_TTL_MS) {
-    return cached.token;
-  }
-
-  const res = await fetch(`${BASE_URL}/token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ address, password }),
-  });
-  if (!res.ok) {
-    tokenCache.delete(address);
-    if (res.status === 401) throw new TempMailAuthError("This inbox is no longer available");
-    throw new TempMailError("Could not access this inbox");
-  }
-  const json = await res.json();
-  tokenCache.set(address, { token: json.token, fetchedAt: Date.now() });
-  return json.token as string;
 }
 
 export async function checkInbox(
   address: string,
-  password: string
+  inboxId: string
 ): Promise<{ received: false } | { received: true; subject: string; text: string }> {
-  let token = await getToken(address, password);
-
-  let listRes = await fetch(`${BASE_URL}/messages`, {
-    headers: { Authorization: `Bearer ${token}` },
-    cache: "no-store",
-  });
-  if (listRes.status === 401) {
-    // Cached token went stale mid-window — refresh once and retry.
-    token = await getToken(address, password, true);
-    listRes = await fetch(`${BASE_URL}/messages`, {
-      headers: { Authorization: `Bearer ${token}` },
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}?f=check_email&seq=0&sid_token=${encodeURIComponent(inboxId)}`, {
       cache: "no-store",
     });
+  } catch (err) {
+    console.error("[tempMail] network error checking inbox:", err);
+    throw new TempMailError("Could not check this inbox");
   }
-  if (!listRes.ok) throw new TempMailError("Could not check this inbox");
-  const list = await listRes.json();
-  const first = list?.["hydra:member"]?.[0];
-  if (!first) return { received: false };
 
-  const msgRes = await fetch(`${BASE_URL}/messages/${first.id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-    cache: "no-store",
-  });
-  if (!msgRes.ok) return { received: false };
-  const msg = await msgRes.json();
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    console.error(`[tempMail] check_email returned ${res.status}: ${body.slice(0, 300)}`);
+    return { received: false };
+  }
 
-  return {
-    received: true,
-    subject: msg.subject || "",
-    text: msg.text || msg.intro || "",
-  };
+  const json = await res.json().catch(() => null);
+  if (json?.auth?.success === false) {
+    throw new TempMailAuthError("This inbox is no longer available");
+  }
+
+  const list = json?.list as Array<{ mail_id: number | string; mail_subject?: string; mail_excerpt?: string }> | undefined;
+  if (!list || list.length === 0) return { received: false };
+
+  // Guerrilla Mail's own auto-generated "Welcome" message (mail_id 1) is
+  // present in every fresh inbox — it's not a real verification code, so
+  // skip it and only report a genuine incoming message.
+  const real = list.find((m) => String(m.mail_id) !== "1") ?? null;
+  if (!real) return { received: false };
+
+  // The list endpoint only gives an excerpt — fetch the full message for
+  // the actual body (needed to extract a full OTP code reliably).
+  let text = real.mail_excerpt || "";
+  try {
+    const detailRes = await fetch(
+      `${BASE_URL}?f=fetch_email&email_id=${encodeURIComponent(real.mail_id)}&sid_token=${encodeURIComponent(inboxId)}`,
+      { cache: "no-store" }
+    );
+    if (detailRes.ok) {
+      const detail = await detailRes.json().catch(() => null);
+      if (detail?.mail_body) text = detail.mail_body as string;
+    }
+  } catch {
+    // Fall back to the excerpt already captured above.
+  }
+
+  return { received: true, subject: real.mail_subject || "", text };
 }
