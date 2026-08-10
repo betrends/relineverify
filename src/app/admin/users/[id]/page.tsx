@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import AdminUserActions from "@/components/admin/AdminUserActions";
 
 export default async function AdminUserDetailPage({ params }: { params: { id: string } }) {
   const user = await prisma.user.findUnique({
@@ -54,6 +55,13 @@ export default async function AdminUserDetailPage({ params }: { params: { id: st
         <InfoCard label="Email verified" value={user.emailVerifiedAt ? new Date(user.emailVerifiedAt).toLocaleDateString() : "No"} />
         <InfoCard label="Joined" value={new Date(user.createdAt).toLocaleDateString()} />
       </div>
+
+      <AdminUserActions
+        userId={user.id}
+        initialName={user.name || ""}
+        initialPhone={user.phone || ""}
+        initialEmail={user.email}
+      />
 
       {(user.referralCode || user.referredBy || user.referrals.length > 0) && (
         <Section title="Referrals">
