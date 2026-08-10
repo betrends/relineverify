@@ -250,8 +250,6 @@
       "errorGeneric": "Something went wrong",
       "orContinueWith": "or continue with",
       "continueWithGoogle": "Continue with Google",
-      "continueWithApple": "Continue with Apple",
-      "appleComingSoon": "Apple sign-in is coming soon.",
       "passwordsDontMatch": "Passwords don't match"
     },
     "trust": {

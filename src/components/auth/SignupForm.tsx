@@ -28,7 +28,6 @@ export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [agreed, setAgreed] = useState(false);
-  const [ssoNotice, setSsoNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [referralCode, setReferralCode] = useState<string | null>(null);
@@ -217,24 +216,13 @@ export default function SignupForm() {
             <span className="h-px flex-1 bg-slate-100 dark:bg-ink-800" />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <a
-              href={referralCode ? `/api/auth/google?ref=${encodeURIComponent(referralCode)}` : "/api/auth/google"}
-              className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 focus-ring dark:border-ink-700 dark:text-slate-300 dark:hover:bg-ink-800"
-            >
-              <GoogleLogo />
-              {tc("continueWithGoogle")}
-            </a>
-            <button
-              type="button"
-              onClick={() => setSsoNotice(tc("appleComingSoon"))}
-              className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 focus-ring dark:border-ink-700 dark:text-slate-300 dark:hover:bg-ink-800"
-            >
-              <AppleLogo />
-              {tc("continueWithApple")}
-            </button>
-          </div>
-          <AnimatedError message={ssoNotice} className="text-slate-400" />
+          <a
+            href={referralCode ? `/api/auth/google?ref=${encodeURIComponent(referralCode)}` : "/api/auth/google"}
+            className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 focus-ring dark:border-ink-700 dark:text-slate-300 dark:hover:bg-ink-800"
+          >
+            <GoogleLogo />
+            {tc("continueWithGoogle")}
+          </a>
         </form>
       </div>
 
@@ -380,11 +368,3 @@ function GoogleLogo() {
   );
 }
 
-function AppleLogo() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-      <path d="M14.6 10.6c0-2 1.6-3 1.7-3-.9-1.3-2.3-1.5-2.8-1.5-1.2-.1-2.3.7-2.9.7-.6 0-1.5-.7-2.5-.7-1.3 0-2.5.7-3.1 1.9-1.3 2.3-.3 5.7.9 7.6.6.9 1.3 2 2.3 1.9 1 0 1.3-.6 2.5-.6s1.5.6 2.5.6c1 0 1.7-.9 2.3-1.8.7-1 1-2 1-2.1-.1 0-2-0.8-2-2.9Z" />
-      <path d="M12.6 4.7c.5-.6.9-1.5.8-2.4-.8 0-1.7.5-2.3 1.2-.5.6-.9 1.5-.8 2.3.9.1 1.8-.4 2.3-1.1Z" />
-    </svg>
-  );
-}

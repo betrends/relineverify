@@ -250,8 +250,6 @@
       "errorGeneric": "Algo salió mal",
       "orContinueWith": "o continúa con",
       "continueWithGoogle": "Continuar con Google",
-      "continueWithApple": "Continuar con Apple",
-      "appleComingSoon": "El inicio de sesión con Apple llega pronto.",
       "passwordsDontMatch": "Las contraseñas no coinciden"
     },
     "trust": {
