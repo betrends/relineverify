@@ -16,6 +16,7 @@
   },
   "hero": {
     "eyebrow": "VERIFICAÇÃO POR SMS E EMAIL",
+    "liveCounter": "códigos entregues hoje",
     "headingLine1": "Um número chega.",
     "headingLine2": "Um código chega.",
     "headingLine3": "Você está verificado.",

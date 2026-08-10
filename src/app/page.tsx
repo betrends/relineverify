@@ -5,6 +5,9 @@ import HeroBackground from "@/components/motion/HeroBackground";
 import HeroContent from "@/components/motion/HeroContent";
 import HeroDemoCard from "@/components/motion/HeroDemoCard";
 import Reveal from "@/components/motion/Reveal";
+import HoverLift from "@/components/motion/HoverLift";
+import CountUpStat from "@/components/motion/CountUpStat";
+import StepBadge from "@/components/motion/StepBadge";
 import { countryCodeToFlag } from "@/lib/countryFlag";
 
 const STEP_KEYS = ["step1", "step2", "step3"] as const;
@@ -98,7 +101,7 @@ export default function LandingPage() {
             {STEP_KEYS.map((step, i) => (
               <Reveal key={step} delay={i * 0.1}>
                 <div>
-                  <p className="font-mono text-sm text-violet-600 dark:text-violet-300">{String(i + 1).padStart(2, "0")}</p>
+                  <StepBadge number={String(i + 1).padStart(2, "0")} showLine={i < STEP_KEYS.length - 1} />
                   <h3 className="mt-3 font-display text-xl font-700 text-slate-900 dark:text-paper-100">
                     {how(`${step}Title`)}
                   </h3>
@@ -115,9 +118,10 @@ export default function LandingPage() {
           <div className="grid gap-8 sm:grid-cols-4">
             {TRUST_STATS.map((s, i) => (
               <Reveal key={s.key} delay={i * 0.08} className="text-center">
-                <p className="font-display text-4xl font-700 text-violet-600 dark:text-violet-300 sm:text-5xl">
-                  {s.value}
-                </p>
+                <CountUpStat
+                  target={s.value}
+                  className="block font-display text-4xl font-700 tabular-nums text-violet-600 dark:text-violet-300 sm:text-5xl"
+                />
                 <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{trust(s.key)}</p>
               </Reveal>
             ))}
@@ -136,7 +140,7 @@ export default function LandingPage() {
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {TESTIMONIALS.map((review, i) => (
               <Reveal key={review.name} delay={i * 0.06}>
-                <div className="h-full rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-ink-700 dark:bg-ink-900">
+                <HoverLift className="h-full rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-ink-700 dark:bg-ink-900">
                   <StarRating rating={review.rating} />
                   <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
                     &ldquo;{review.quote}&rdquo;
@@ -154,7 +158,7 @@ export default function LandingPage() {
                       </p>
                     </div>
                   </div>
-                </div>
+                </HoverLift>
               </Reveal>
             ))}
           </div>

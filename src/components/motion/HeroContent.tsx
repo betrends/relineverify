@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
+import LiveCounterBadge from "./LiveCounterBadge";
 
 const container: Variants = {
   hidden: {},
@@ -19,6 +20,7 @@ export default function HeroContent() {
 
   return (
     <motion.div variants={container} initial="hidden" animate="show">
+      <LiveCounterBadge />
       <motion.p
         variants={item}
         className="mb-4 font-mono text-xs uppercase tracking-[0.3em] text-violet-600 dark:text-violet-300"
