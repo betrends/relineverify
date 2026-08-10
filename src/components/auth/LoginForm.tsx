@@ -31,6 +31,7 @@ export default function LoginForm() {
     const oauthError = params.get("error");
     if (oauthError) setError(oauthError);
     if (params.get("verified") === "1") setNotice(t("verifiedNotice"));
+    if (params.get("reason") === "idle") setNotice(t("idleLogoutNotice"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

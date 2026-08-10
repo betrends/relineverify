@@ -292,6 +292,7 @@
       "rememberMe": "Lembrar de mim",
       "forgotPassword": "Esqueceu a senha?",
       "verifiedNotice": "Seu email foi verificado. Você já pode entrar.",
+      "idleLogoutNotice": "Você foi desconectado após um período de inatividade.",
       "signingIn": "Entrando…",
       "signIn": "Entrar"
     },

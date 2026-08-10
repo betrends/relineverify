@@ -6,6 +6,7 @@ import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 import Footer from "@/components/dashboard/Footer";
 import VerifyEmailBanner from "@/components/dashboard/VerifyEmailBanner";
+import IdleLogout from "@/components/dashboard/IdleLogout";
 
 export default async function DashboardLayout({
   children,
@@ -18,6 +19,7 @@ export default async function DashboardLayout({
   return (
     <SearchProvider>
       <MobileNavProvider>
+        <IdleLogout />
         <div id="top" className="flex min-h-screen bg-slate-50 text-slate-900 dark:bg-ink-950 dark:text-paper-100">
           <Sidebar />
           <div className="flex min-w-0 flex-1 flex-col">

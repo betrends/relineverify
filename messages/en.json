@@ -292,6 +292,7 @@
       "rememberMe": "Remember me",
       "forgotPassword": "Forgot password?",
       "verifiedNotice": "Your email is verified. You can log in now.",
+      "idleLogoutNotice": "You were signed out after a period of inactivity.",
       "signingIn": "Signing in…",
       "signIn": "Sign In"
     },

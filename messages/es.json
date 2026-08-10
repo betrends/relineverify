@@ -292,6 +292,7 @@
       "rememberMe": "Recuérdame",
       "forgotPassword": "¿Olvidaste tu contraseña?",
       "verifiedNotice": "Tu correo está verificado. Ya puedes iniciar sesión.",
+      "idleLogoutNotice": "Se cerró tu sesión por inactividad.",
       "signingIn": "Iniciando sesión…",
       "signIn": "Iniciar sesión"
     },
