@@ -5,7 +5,20 @@ import { prisma } from "@/lib/prisma";
 export default async function AdminUserDetailPage({ params }: { params: { id: string } }) {
   const user = await prisma.user.findUnique({
     where: { id: params.id },
-    include: {
+    // Explicit field list — deliberately never includes passwordHash. Using
+    // `include` here would pull every scalar column (hash included) into
+    // server memory even though nothing on this page renders it; `select`
+    // keeps that data out of the query entirely.
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      walletBalance: true,
+      emailVerifiedAt: true,
+      isAdmin: true,
+      createdAt: true,
+      referralCode: true,
       orders: { orderBy: { createdAt: "desc" }, take: 20 },
       generatedEmails: { orderBy: { createdAt: "desc" }, take: 20 },
       transactions: { orderBy: { createdAt: "desc" }, take: 30 },
