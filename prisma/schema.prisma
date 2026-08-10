@@ -17,6 +17,7 @@ model User {
   avatarUrl          String?
   emailVerifiedAt    DateTime?
   walletBalance      Int                      @default(0)
+  isAdmin            Boolean                  @default(false)
   createdAt          DateTime                 @default(now())
   orders             Order[]
   transactions       Transaction[]
@@ -88,7 +89,7 @@ model GeneratedEmail {
   userId          String
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   address         String   @unique
-  providerInboxId String // Mailslurp inbox ID used to poll for incoming mail — server-only, never returned to the client
+  providerInboxId String // temp-mail provider's session/inbox ID used to poll for incoming mail — server-only, never returned to the client
   costCharged     Int
   emailText       String?
   status          String // "pending" | "received" | "expired"

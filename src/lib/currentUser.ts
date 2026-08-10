@@ -6,6 +6,6 @@ export async function getCurrentUser() {
   if (!session) return null;
   return prisma.user.findUnique({
     where: { id: session.userId },
-    select: { email: true, name: true },
+    select: { id: true, email: true, name: true, isAdmin: true },
   });
 }
