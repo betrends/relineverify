@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import InstallPrompt from "@/components/InstallPrompt";
 import "./globals.css";
 
 const display = Space_Grotesk({
@@ -72,7 +73,10 @@ export default async function RootLayout({
       <body className="font-body bg-ink-950 text-paper-100 antialiased">
         <ServiceWorkerRegister />
         <NextIntlClientProvider messages={messages}>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            {children}
+            <InstallPrompt />
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>
