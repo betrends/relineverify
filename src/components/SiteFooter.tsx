@@ -20,6 +20,9 @@ export default function SiteFooter() {
           </Link>
         </div>
       </div>
+      <p className="mt-6 text-center font-serif text-xs italic tracking-wide text-slate-300 opacity-60 transition-opacity duration-500 hover:opacity-100 dark:text-ink-700">
+        crafted by Aow
+      </p>
     </footer>
   );
 }
