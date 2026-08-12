@@ -41,7 +41,7 @@ export default function EmailGenerateForm({ onGenerated }: { onGenerated: (email
   return (
     <HoverLift
       id="generate-email"
-      className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-ink-700 dark:bg-ink-900"
+      className="rounded-2xl border border-violet-100/60 bg-white/70 p-6 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/50"
     >
       <div className="flex items-center gap-3">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-300">

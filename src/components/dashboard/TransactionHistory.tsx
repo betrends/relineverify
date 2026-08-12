@@ -65,7 +65,7 @@ export default function TransactionHistory() {
   }
 
   return (
-    <HoverLift className="overflow-hidden rounded-2xl border border-slate-100 bg-white dark:border-ink-700 dark:bg-ink-900">
+    <HoverLift className="overflow-hidden rounded-2xl border border-violet-100/60 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/50">
       <div className="divide-y divide-slate-100 dark:divide-ink-800">
         {transactions.map((tx) => {
           const meta = TYPE_META[tx.type];

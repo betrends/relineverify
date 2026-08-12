@@ -19,7 +19,7 @@ export default function SupportPage() {
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <Reveal delay={0.05}>
-          <HoverLift className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-ink-700 dark:bg-ink-900">
+          <HoverLift className="flex items-center gap-4 rounded-2xl border border-violet-100/60 bg-white/70 p-6 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/50">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-300">
               <MailIcon />
             </span>
@@ -38,7 +38,7 @@ export default function SupportPage() {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <HoverLift className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-ink-700 dark:bg-ink-900">
+          <HoverLift className="flex items-center gap-4 rounded-2xl border border-violet-100/60 bg-white/70 p-6 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/50">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300">
               <WhatsAppIcon />
             </span>
@@ -60,7 +60,7 @@ export default function SupportPage() {
       </div>
 
       <Reveal delay={0.15} className="mt-8">
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-ink-700 dark:bg-ink-900">
+        <div className="rounded-2xl border border-violet-100/60 bg-white/70 p-6 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/50">
           <h2 className="font-display text-lg font-700 text-slate-900 dark:text-paper-100">
             Frequently asked questions
           </h2>

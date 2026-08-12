@@ -79,7 +79,7 @@ export default function StatsStrip({ orders, emails }: { orders: Order[]; emails
       {stats.map((s, i) => {
         const card = (
           <HoverLift
-            className={`flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-ink-700 dark:bg-ink-900 ${
+            className={`flex items-center justify-between rounded-2xl border border-violet-100/60 bg-white/70 p-5 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/50 ${
               s.href ? "cursor-pointer" : ""
             }`}
           >

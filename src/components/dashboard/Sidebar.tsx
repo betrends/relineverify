@@ -41,7 +41,7 @@ export default function Sidebar() {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 shrink-0 flex-col border-r border-slate-100 bg-white px-4 py-6 transition-transform duration-200 ease-out dark:border-ink-800 dark:bg-ink-950 md:sticky md:top-0 md:z-auto md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 shrink-0 flex-col border-r border-violet-100/60 bg-white/70 px-4 py-6 backdrop-blur-xl transition-transform duration-200 ease-out dark:border-white/10 dark:bg-ink-950/70 md:sticky md:top-0 md:z-auto md:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >

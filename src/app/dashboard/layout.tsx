@@ -7,6 +7,7 @@ import Header from "@/components/dashboard/Header";
 import Footer from "@/components/dashboard/Footer";
 import VerifyEmailBanner from "@/components/dashboard/VerifyEmailBanner";
 import IdleLogout from "@/components/dashboard/IdleLogout";
+import DashboardBackdrop from "@/components/motion/DashboardBackdrop";
 
 export default async function DashboardLayout({
   children,

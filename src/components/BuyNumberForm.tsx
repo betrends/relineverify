@@ -167,7 +167,7 @@ export default function BuyNumberForm({ onBought }: { onBought: (order: any) => 
   }
 
   return (
-    <HoverLift id="buy" className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-ink-700 dark:bg-ink-900">
+    <HoverLift id="buy" className="rounded-2xl border border-violet-100/60 bg-white/70 p-6 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/50">
       <h2 className="font-display text-lg font-700 text-slate-900 dark:text-paper-100">{t("title")}</h2>
       <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t("subtitle")}</p>
 

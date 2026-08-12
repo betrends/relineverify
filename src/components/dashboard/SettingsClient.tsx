@@ -67,7 +67,7 @@ export default function SettingsClient() {
 
 function Card({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
   return (
-    <HoverLift className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-ink-700 dark:bg-ink-900">
+    <HoverLift className="rounded-2xl border border-violet-100/60 bg-white/70 p-6 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/50">
       <h2 className="font-display text-lg font-700 text-slate-900 dark:text-paper-100">{title}</h2>
       <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
       <div className="mt-5">{children}</div>

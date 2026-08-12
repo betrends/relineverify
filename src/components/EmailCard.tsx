@@ -133,7 +133,7 @@ export default function EmailCard({
       exit={{ opacity: 0, scale: 0.96 }}
       whileHover={{ y: -4 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-ink-700 dark:bg-ink-900"
+      className="rounded-xl border border-violet-100/60 bg-white/70 p-5 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/50"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">

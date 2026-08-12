@@ -62,11 +62,11 @@ export default function ReferralsClient() {
     <div className="space-y-6">
       <Reveal>
         <div className="grid gap-4 sm:grid-cols-2">
-          <HoverLift className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-ink-700 dark:bg-ink-900">
+          <HoverLift className="rounded-2xl border border-violet-100/60 bg-white/70 p-5 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/50">
             <p className="text-sm text-slate-500 dark:text-slate-400">{t("friendsReferred")}</p>
             <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-paper-100">{data.totalReferred}</p>
           </HoverLift>
-          <HoverLift className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-ink-700 dark:bg-ink-900">
+          <HoverLift className="rounded-2xl border border-violet-100/60 bg-white/70 p-5 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/50">
             <p className="text-sm text-slate-500 dark:text-slate-400">{t("totalEarned")}</p>
             <p className="mt-1 text-2xl font-bold text-emerald-600 dark:text-mint-400">
               ₦{data.totalEarned.toLocaleString()}
@@ -76,7 +76,7 @@ export default function ReferralsClient() {
       </Reveal>
 
       <Reveal delay={0.05}>
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-ink-700 dark:bg-ink-900">
+        <div className="rounded-2xl border border-violet-100/60 bg-white/70 p-6 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/50">
           <h2 className="font-display text-lg font-700 text-slate-900 dark:text-paper-100">
             {t("earnForLife", { percent: data.percent })}
           </h2>
@@ -132,7 +132,7 @@ export default function ReferralsClient() {
               description={t("noEarningsDesc")}
             />
           ) : (
-            <HoverLift className="mt-4 overflow-hidden rounded-2xl border border-slate-100 bg-white dark:border-ink-700 dark:bg-ink-900">
+            <HoverLift className="mt-4 overflow-hidden rounded-2xl border border-violet-100/60 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/50">
               <div className="divide-y divide-slate-100 dark:divide-ink-800">
                 {data.earnings.map((e) => (
                   <div key={e.id} className="flex items-center justify-between gap-4 px-6 py-4">

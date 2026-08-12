@@ -61,7 +61,7 @@ export default function Header({ email, name }: { email: string; name?: string |
   }
 
   return (
-    <header className="flex items-center gap-4 border-b border-slate-100 bg-white px-6 py-4 dark:border-ink-800 dark:bg-ink-950">
+    <header className="sticky top-0 z-30 flex items-center gap-4 border-b border-violet-100/60 bg-white/70 px-6 py-4 backdrop-blur-xl dark:border-white/10 dark:bg-ink-950/70">
       <button
         onClick={toggleMobileNav}
         aria-label={t("openMenu")}
