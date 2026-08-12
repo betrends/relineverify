@@ -57,10 +57,15 @@ const config: Config = {
           "0%, 100%": { opacity: "0.35" },
           "50%": { opacity: "1" },
         },
+        gradientShift: {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
       },
       animation: {
         scramble: "scramble 0.15s ease-out",
         pulseDot: "pulseDot 1.4s ease-in-out infinite",
+        "gradient-shift": "gradientShift 6s ease-in-out infinite",
       },
     },
   },

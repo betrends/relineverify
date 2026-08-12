@@ -35,7 +35,9 @@ export default function HeroContent() {
         <br />
         {t("headingLine2")}
         <br />
-        <span className="text-violet-600 dark:text-violet-300">{t("headingLine3")}</span>
+        <span className="animate-gradient-shift bg-gradient-to-r from-violet-600 via-blue-500 to-violet-600 bg-[length:200%_auto] bg-clip-text text-transparent dark:from-violet-300 dark:via-blue-300 dark:to-violet-300">
+          {t("headingLine3")}
+        </span>
       </motion.h1>
       <motion.p variants={item} className="mt-6 max-w-md text-lg text-slate-500 dark:text-slate-400">
         {t("subtext")}

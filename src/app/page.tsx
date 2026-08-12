@@ -5,9 +5,11 @@ import PageBackdrop from "@/components/motion/PageBackdrop";
 import HeroContent from "@/components/motion/HeroContent";
 import HeroDemoCard from "@/components/motion/HeroDemoCard";
 import Reveal from "@/components/motion/Reveal";
-import HoverLift from "@/components/motion/HoverLift";
+import TiltCard from "@/components/motion/TiltCard";
 import CountUpStat from "@/components/motion/CountUpStat";
 import StepBadge from "@/components/motion/StepBadge";
+import CursorSpotlight from "@/components/motion/CursorSpotlight";
+import FloatingIcons from "@/components/motion/FloatingIcons";
 import { countryCodeToFlag } from "@/lib/countryFlag";
 
 const STEP_KEYS = ["step1", "step2", "step3"] as const;
@@ -86,10 +88,11 @@ export default function LandingPage() {
       <SiteNav />
 
       <section className="relative mx-auto max-w-6xl px-6 pb-24 pt-20">
-        <div className="grid items-center gap-16 lg:grid-cols-2">
+        <FloatingIcons />
+        <CursorSpotlight className="grid items-center gap-16 lg:grid-cols-2">
           <HeroContent />
           <HeroDemoCard />
-        </div>
+        </CursorSpotlight>
       </section>
 
       <section id="how" className="mx-auto max-w-6xl px-6 py-16">
@@ -99,13 +102,13 @@ export default function LandingPage() {
         <div className="mt-10 grid gap-5 sm:grid-cols-3">
           {STEP_KEYS.map((step, i) => (
             <Reveal key={step} delay={i * 0.1}>
-              <div className="h-full rounded-3xl border border-violet-100 bg-white/70 p-6 shadow-[0_8px_32px_-12px_rgba(124,92,252,0.15)] backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/40">
+              <TiltCard className="h-full rounded-3xl border border-violet-100 bg-white/70 p-6 shadow-[0_8px_32px_-12px_rgba(124,92,252,0.15)] backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/40">
                 <StepBadge number={String(i + 1).padStart(2, "0")} showLine={i < STEP_KEYS.length - 1} />
                 <h3 className="mt-4 font-display text-xl font-700 text-slate-900 dark:text-paper-100">
                   {how(`${step}Title`)}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{how(`${step}Body`)}</p>
-              </div>
+              </TiltCard>
             </Reveal>
           ))}
         </div>
@@ -137,7 +140,7 @@ export default function LandingPage() {
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {TESTIMONIALS.map((review, i) => (
             <Reveal key={review.name} delay={i * 0.06}>
-              <HoverLift className="h-full rounded-3xl border border-violet-100 bg-white/70 p-6 shadow-[0_8px_32px_-12px_rgba(124,92,252,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/40">
+              <TiltCard className="h-full rounded-3xl border border-violet-100 bg-white/70 p-6 shadow-[0_8px_32px_-12px_rgba(124,92,252,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/40">
                 <StarRating rating={review.rating} />
                 <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
                   &ldquo;{review.quote}&rdquo;
@@ -155,7 +158,7 @@ export default function LandingPage() {
                     </p>
                   </div>
                 </div>
-              </HoverLift>
+              </TiltCard>
             </Reveal>
           ))}
         </div>
