@@ -9,7 +9,6 @@ import TiltCard from "@/components/motion/TiltCard";
 import CountUpStat from "@/components/motion/CountUpStat";
 import StepBadge from "@/components/motion/StepBadge";
 import CursorSpotlight from "@/components/motion/CursorSpotlight";
-import FloatingIcons from "@/components/motion/FloatingIcons";
 import { countryCodeToFlag } from "@/lib/countryFlag";
 
 const STEP_KEYS = ["step1", "step2", "step3"] as const;
@@ -88,7 +87,6 @@ export default function LandingPage() {
       <SiteNav />
 
       <section className="relative mx-auto max-w-6xl px-6 pb-24 pt-20">
-        <FloatingIcons />
         <CursorSpotlight className="grid items-center gap-16 lg:grid-cols-2">
           <HeroContent />
           <HeroDemoCard />

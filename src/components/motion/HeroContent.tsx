@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
 import LiveCounterBadge from "./LiveCounterBadge";
+import ServiceLogoStrip from "./ServiceLogoStrip";
 
 const container: Variants = {
   hidden: {},
@@ -61,6 +62,9 @@ export default function HeroContent() {
         >
           {t("alreadyHaveAccount")}
         </Link>
+      </motion.div>
+      <motion.div variants={item}>
+        <ServiceLogoStrip />
       </motion.div>
     </motion.div>
   );
