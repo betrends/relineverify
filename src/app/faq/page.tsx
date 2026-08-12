@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
+import PageBackdrop from "@/components/motion/PageBackdrop";
 import Reveal from "@/components/motion/Reveal";
 import FaqAccordion from "@/components/dashboard/FaqAccordion";
 
@@ -12,7 +13,8 @@ export const metadata: Metadata = {
 
 export default function FaqPage() {
   return (
-    <div className="min-h-screen bg-white text-slate-900 dark:bg-ink-950 dark:text-paper-100">
+    <div className="min-h-screen text-slate-900 dark:text-paper-100">
+      <PageBackdrop />
       <SiteNav />
 
       <section className="mx-auto max-w-3xl px-6 py-20">
@@ -30,7 +32,7 @@ export default function FaqPage() {
         </Reveal>
 
         <Reveal delay={0.05} className="mt-8">
-          <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-ink-700 dark:bg-ink-900 sm:p-8">
+          <div className="rounded-3xl border border-violet-100 bg-white/70 p-6 shadow-[0_8px_32px_-12px_rgba(124,92,252,0.15)] backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/40 sm:p-8">
             <FaqAccordion />
           </div>
         </Reveal>

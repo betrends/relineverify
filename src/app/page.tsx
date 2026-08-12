@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
-import HeroBackground from "@/components/motion/HeroBackground";
+import PageBackdrop from "@/components/motion/PageBackdrop";
 import HeroContent from "@/components/motion/HeroContent";
 import HeroDemoCard from "@/components/motion/HeroDemoCard";
 import Reveal from "@/components/motion/Reveal";
@@ -81,87 +81,83 @@ export default function LandingPage() {
   const reviews = useTranslations("reviews");
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 dark:bg-ink-950 dark:text-paper-100">
+    <div className="min-h-screen text-slate-900 dark:text-paper-100">
+      <PageBackdrop />
       <SiteNav />
 
       <section className="relative mx-auto max-w-6xl px-6 pb-24 pt-20">
-        <HeroBackground />
         <div className="grid items-center gap-16 lg:grid-cols-2">
           <HeroContent />
           <HeroDemoCard />
         </div>
       </section>
 
-      <section id="how" className="border-t border-slate-100 bg-slate-50 dark:border-ink-800 dark:bg-ink-900">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <Reveal>
-            <h2 className="font-display text-3xl font-700 tracking-tight text-slate-900 dark:text-paper-100">{how("heading")}</h2>
-          </Reveal>
-          <div className="mt-10 grid gap-8 sm:grid-cols-3">
-            {STEP_KEYS.map((step, i) => (
-              <Reveal key={step} delay={i * 0.1}>
-                <div>
-                  <StepBadge number={String(i + 1).padStart(2, "0")} showLine={i < STEP_KEYS.length - 1} />
-                  <h3 className="mt-3 font-display text-xl font-700 text-slate-900 dark:text-paper-100">
-                    {how(`${step}Title`)}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{how(`${step}Body`)}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
+      <section id="how" className="mx-auto max-w-6xl px-6 py-16">
+        <Reveal>
+          <h2 className="font-display text-3xl font-700 tracking-tight text-slate-900 dark:text-paper-100">{how("heading")}</h2>
+        </Reveal>
+        <div className="mt-10 grid gap-5 sm:grid-cols-3">
+          {STEP_KEYS.map((step, i) => (
+            <Reveal key={step} delay={i * 0.1}>
+              <div className="h-full rounded-3xl border border-violet-100 bg-white/70 p-6 shadow-[0_8px_32px_-12px_rgba(124,92,252,0.15)] backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/40">
+                <StepBadge number={String(i + 1).padStart(2, "0")} showLine={i < STEP_KEYS.length - 1} />
+                <h3 className="mt-4 font-display text-xl font-700 text-slate-900 dark:text-paper-100">
+                  {how(`${step}Title`)}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{how(`${step}Body`)}</p>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </section>
 
-      <section className="border-t border-slate-100 bg-white dark:border-ink-800 dark:bg-ink-950">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="grid gap-8 sm:grid-cols-4">
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <Reveal>
+          <div className="grid divide-y divide-slate-200/70 rounded-3xl border border-violet-100 bg-white/70 shadow-[0_8px_32px_-12px_rgba(124,92,252,0.15)] backdrop-blur-xl dark:divide-white/10 dark:border-white/10 dark:bg-ink-900/40 sm:grid-cols-4 sm:divide-x sm:divide-y-0">
             {TRUST_STATS.map((s, i) => (
-              <Reveal key={s.key} delay={i * 0.08} className="text-center">
+              <div key={s.key} className="px-6 py-8 text-center">
                 <CountUpStat
                   target={s.value}
-                  className="block font-display text-4xl font-700 tabular-nums text-violet-600 dark:text-violet-300 sm:text-5xl"
+                  className="block bg-gradient-to-br from-violet-600 to-blue-500 bg-clip-text font-display text-4xl font-700 tabular-nums text-transparent dark:from-violet-300 dark:to-blue-300 sm:text-5xl"
                 />
                 <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{trust(s.key)}</p>
-              </Reveal>
+              </div>
             ))}
           </div>
-        </div>
+        </Reveal>
       </section>
 
-      <section className="border-t border-slate-100 bg-slate-50 dark:border-ink-800 dark:bg-ink-900">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <Reveal>
-            <h2 className="font-display text-3xl font-700 tracking-tight text-slate-900 dark:text-paper-100">
-              {reviews("heading")}
-            </h2>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{reviews("subtext")}</p>
-          </Reveal>
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {TESTIMONIALS.map((review, i) => (
-              <Reveal key={review.name} delay={i * 0.06}>
-                <HoverLift className="h-full rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-ink-700 dark:bg-ink-900">
-                  <StarRating rating={review.rating} />
-                  <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                    &ldquo;{review.quote}&rdquo;
-                  </p>
-                  <div className="mt-5 flex items-center gap-3">
-                    <span
-                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white ${review.bg}`}
-                    >
-                      {review.initials}
-                    </span>
-                    <div>
-                      <p className="text-sm font-medium text-slate-900 dark:text-paper-100">{review.name}</p>
-                      <p className="text-xs text-slate-400">
-                        {countryCodeToFlag(review.country)} {review.countryName}
-                      </p>
-                    </div>
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <Reveal>
+          <h2 className="font-display text-3xl font-700 tracking-tight text-slate-900 dark:text-paper-100">
+            {reviews("heading")}
+          </h2>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{reviews("subtext")}</p>
+        </Reveal>
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {TESTIMONIALS.map((review, i) => (
+            <Reveal key={review.name} delay={i * 0.06}>
+              <HoverLift className="h-full rounded-3xl border border-violet-100 bg-white/70 p-6 shadow-[0_8px_32px_-12px_rgba(124,92,252,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/40">
+                <StarRating rating={review.rating} />
+                <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                  &ldquo;{review.quote}&rdquo;
+                </p>
+                <div className="mt-5 flex items-center gap-3">
+                  <span
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white ${review.bg}`}
+                  >
+                    {review.initials}
+                  </span>
+                  <div>
+                    <p className="text-sm font-medium text-slate-900 dark:text-paper-100">{review.name}</p>
+                    <p className="text-xs text-slate-400">
+                      {countryCodeToFlag(review.country)} {review.countryName}
+                    </p>
                   </div>
-                </HoverLift>
-              </Reveal>
-            ))}
-          </div>
+                </div>
+              </HoverLift>
+            </Reveal>
+          ))}
         </div>
       </section>
 

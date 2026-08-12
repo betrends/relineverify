@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
+import PageBackdrop from "@/components/motion/PageBackdrop";
 import PlatformsGrid from "@/components/PlatformsGrid";
 
 export const metadata: Metadata = {
@@ -10,7 +11,8 @@ export const metadata: Metadata = {
 
 export default function ServicesPage() {
   return (
-    <div className="min-h-screen bg-white text-slate-900 dark:bg-ink-950 dark:text-paper-100">
+    <div className="min-h-screen text-slate-900 dark:text-paper-100">
+      <PageBackdrop />
       <SiteNav />
 
       <section className="mx-auto max-w-5xl px-6 py-20">

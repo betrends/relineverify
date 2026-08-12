@@ -57,8 +57,9 @@ export default function ResetPasswordForm() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-white px-6 py-10 dark:bg-ink-950 lg:px-16 lg:py-12">
-      <div className="flex items-center justify-end gap-4 text-sm text-slate-500 dark:text-slate-400">
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-white px-6 py-10 dark:bg-ink-950 lg:px-16 lg:py-12">
+      <div className="pointer-events-none absolute -right-32 -top-32 h-72 w-72 rounded-full bg-gradient-to-br from-violet-200/40 to-blue-200/30 blur-[100px] dark:from-violet-500/10 dark:to-blue-500/10" />
+      <div className="relative flex items-center justify-end gap-4 text-sm text-slate-500 dark:text-slate-400">
         <ThemeToggleButton />
         <Link href="/login" className="font-medium text-violet-600 hover:underline dark:text-violet-300">
           {t("backToLogin")}
@@ -126,7 +127,7 @@ export default function ResetPasswordForm() {
               <MotionButton
                 type="submit"
                 disabled={loading}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-violet-600 py-3.5 font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50 focus-ring"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-blue-500 py-3.5 font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50 focus-ring"
               >
                 {loading ? t("updating") : t("updatePassword")}
                 {!loading && <ArrowRightIcon />}

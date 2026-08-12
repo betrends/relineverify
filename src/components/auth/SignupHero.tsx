@@ -81,7 +81,7 @@ export default function SignupHero() {
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-2 border-t border-slate-100 pt-4 dark:border-ink-800">
+        <div className="grid grid-cols-4 gap-2 rounded-2xl border border-violet-100 bg-white/60 p-3 backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/40">
           {STATS.map((s) => (
             <div key={s.label}>
               <span className="text-violet-500 dark:text-violet-300">{s.icon}</span>
@@ -102,15 +102,28 @@ export default function SignupHero() {
 function OrbitBackground() {
   return (
     <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div
+        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+        style={{
+          backgroundImage:
+            "linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }}
+      />
       <motion.div
-        className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-violet-200/30 blur-[100px]"
+        className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-violet-200/35 blur-[100px] dark:bg-violet-500/15"
         animate={{ x: [0, 30, -10, 0], y: [0, 20, -10, 0] }}
         transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-blue-200/20 blur-[100px]"
+        className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-blue-200/30 blur-[100px] dark:bg-blue-500/10"
         animate={{ x: [0, -20, 10, 0], y: [0, -20, 10, 0] }}
         transition={{ duration: 28, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-fuchsia-200/20 blur-[110px] dark:bg-fuchsia-500/10"
+        animate={{ x: [0, 20, -20, 0], y: [0, -15, 15, 0] }}
+        transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
       />
     </div>
   );

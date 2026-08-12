@@ -39,7 +39,7 @@ export default function SiteNav() {
     <motion.header
       animate={{ y: hidden ? "-100%" : "0%" }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="sticky top-0 z-50 border-b border-slate-100 bg-white/80 backdrop-blur-md dark:border-ink-800 dark:bg-ink-950/80"
+      className="sticky top-0 z-50 border-b border-violet-100/60 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-ink-950/70"
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <Link href="/" className="flex items-center gap-2 font-display text-lg font-700 tracking-tight text-slate-900 dark:text-paper-100">
@@ -74,7 +74,7 @@ export default function SiteNav() {
           <ThemeToggleButton className="h-8 w-8" />
           <Link
             href="/signup"
-            className="ml-2 rounded-full bg-violet-500 px-4 py-2 font-medium text-white transition-colors hover:bg-violet-600 focus-ring"
+            className="ml-2 rounded-full bg-gradient-to-r from-violet-500 to-blue-500 px-4 py-2 font-medium text-white shadow-[0_0_0_0_rgba(124,92,252,0.5)] transition-all hover:shadow-[0_0_20px_2px_rgba(124,92,252,0.35)] focus-ring"
           >
             {t("getStarted")}
           </Link>
@@ -131,7 +131,7 @@ export default function SiteNav() {
               <Link
                 href="/signup"
                 onClick={() => setMobileOpen(false)}
-                className="mt-2 rounded-full bg-violet-500 px-4 py-2.5 text-center font-medium text-white transition-colors hover:bg-violet-600"
+                className="mt-2 rounded-full bg-gradient-to-r from-violet-500 to-blue-500 px-4 py-2.5 text-center font-medium text-white transition-opacity hover:opacity-90"
               >
                 {t("getStarted")}
               </Link>

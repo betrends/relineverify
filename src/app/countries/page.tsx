@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
+import PageBackdrop from "@/components/motion/PageBackdrop";
 import Reveal from "@/components/motion/Reveal";
 import { countryCodeToFlag } from "@/lib/countryFlag";
 
@@ -32,7 +33,8 @@ export default function CountriesPage() {
   }, [countries, query]);
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 dark:bg-ink-950 dark:text-paper-100">
+    <div className="min-h-screen text-slate-900 dark:text-paper-100">
+      <PageBackdrop />
       <SiteNav />
 
       <section className="mx-auto max-w-5xl px-6 py-20">
@@ -46,7 +48,7 @@ export default function CountriesPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search countries…"
-            className="w-full max-w-sm rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus-ring focus:border-violet-500 dark:border-ink-700 dark:bg-ink-950 dark:text-paper-100"
+            className="w-full max-w-sm rounded-xl border border-violet-100 bg-white/70 px-4 py-2.5 text-sm text-slate-900 shadow-sm backdrop-blur-xl focus-ring focus:border-violet-500 dark:border-white/10 dark:bg-ink-900/50 dark:text-paper-100"
           />
         </Reveal>
 
@@ -56,7 +58,7 @@ export default function CountriesPage() {
           ) : !countries ? (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 9 }).map((_, i) => (
-                <div key={i} className="h-14 animate-pulse rounded-xl bg-slate-100 dark:bg-ink-800" />
+                <div key={i} className="h-14 animate-pulse rounded-xl bg-slate-100/60 dark:bg-ink-800/60" />
               ))}
             </div>
           ) : filtered.length === 0 ? (
@@ -67,7 +69,7 @@ export default function CountriesPage() {
                 <Reveal key={c.id} delay={Math.min(i * 0.02, 0.3)}>
                   <Link
                     href="/signup"
-                    className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white px-4 py-3 text-sm font-medium text-slate-900 shadow-sm transition-colors hover:border-violet-200 hover:bg-violet-50/50 focus-ring dark:border-ink-700 dark:bg-ink-900 dark:text-paper-100 dark:hover:border-violet-500/40 dark:hover:bg-violet-500/10"
+                    className="flex items-center gap-3 rounded-xl border border-violet-100 bg-white/70 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm backdrop-blur-xl transition-colors hover:border-violet-300 hover:bg-violet-50/60 focus-ring dark:border-white/10 dark:bg-ink-900/50 dark:text-paper-100 dark:hover:border-violet-500/40 dark:hover:bg-violet-500/10"
                   >
                     <span className="text-xl leading-none">{countryCodeToFlag(c.code)}</span>
                     <span className="truncate">{c.name}</span>

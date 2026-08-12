@@ -48,7 +48,7 @@ export default function LiveFeedCard({ className = "" }: { className?: string })
       className={`relative mx-auto w-full ${className}`}
     >
       <div className="mb-3 flex justify-center">
-        <div className="flex items-center gap-2 whitespace-nowrap rounded-full border border-slate-100 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-600 shadow-sm dark:border-ink-700 dark:bg-ink-800 dark:text-slate-300">
+        <div className="flex items-center gap-2 whitespace-nowrap rounded-full border border-white/60 bg-white/70 px-3.5 py-1.5 text-xs font-medium text-slate-600 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-ink-800/60 dark:text-slate-300">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
@@ -57,7 +57,7 @@ export default function LiveFeedCard({ className = "" }: { className?: string })
         </div>
       </div>
 
-      <div className="relative h-[clamp(18rem,42vh,28rem)] w-full overflow-hidden rounded-[28px] border border-slate-100 bg-white shadow-2xl dark:border-ink-700 dark:bg-ink-900">
+      <div className="relative h-[clamp(18rem,42vh,28rem)] w-full overflow-hidden rounded-[28px] border border-white/60 bg-white/70 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/60">
         <div className="pointer-events-none absolute inset-x-0 top-3 z-20 flex justify-center">
           {/* A single, always-mounted element toggled via `animate` — conditionally
               mounting/unmounting this through AnimatePresence left orphaned,
@@ -86,7 +86,7 @@ export default function LiveFeedCard({ className = "" }: { className?: string })
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.97 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
-                className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white px-3 py-2.5 shadow-sm dark:border-ink-800 dark:bg-ink-900"
+                className="flex items-center gap-3 rounded-2xl border border-white/60 bg-white/70 px-3 py-2.5 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-ink-900/50"
               >
                 <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${e.bg}`}>
                   {e.icon}
@@ -105,7 +105,7 @@ export default function LiveFeedCard({ className = "" }: { className?: string })
           </AnimatePresence>
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white to-transparent dark:from-ink-900" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white/70 to-transparent dark:from-ink-900/60" />
       </div>
     </motion.div>
   );
