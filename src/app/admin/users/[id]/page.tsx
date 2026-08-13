@@ -3,6 +3,10 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import AdminUserActions from "@/components/admin/AdminUserActions";
 import StatusBadge from "@/components/admin/StatusBadge";
+import TransactionTypeTag from "@/components/admin/TransactionTypeTag";
+import UserAvatar from "@/components/admin/UserAvatar";
+import ServiceIcon from "@/components/ServiceIcon";
+import StatIcon, { CalendarGlyph, CheckGlyph, PhoneGlyph, WalletGlyph } from "@/components/admin/StatIcon";
 
 export default async function AdminUserDetailPage({ params }: { params: { id: string } }) {
   const user = await prisma.user.findUnique({
@@ -38,9 +42,12 @@ export default async function AdminUserDetailPage({ params }: { params: { id: st
           ← Back to users
         </Link>
         <div className="mt-3 flex items-start justify-between">
-          <div>
-            <h1 className="font-display text-2xl font-700 tracking-tight">{user.name || "Unnamed user"}</h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{user.email}</p>
+          <div className="flex items-center gap-3">
+            <UserAvatar name={user.name} email={user.email} className="h-12 w-12 text-base" />
+            <div>
+              <h1 className="font-display text-2xl font-700 tracking-tight">{user.name || "Unnamed user"}</h1>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{user.email}</p>
+            </div>
           </div>
           {user.isAdmin && (
             <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-medium text-violet-600 dark:bg-violet-500/10 dark:text-violet-300">
@@ -51,10 +58,15 @@ export default async function AdminUserDetailPage({ params }: { params: { id: st
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <InfoCard label="Wallet balance" value={`₦${user.walletBalance.toLocaleString()}`} />
-        <InfoCard label="Phone" value={user.phone || "—"} />
-        <InfoCard label="Email verified" value={user.emailVerifiedAt ? new Date(user.emailVerifiedAt).toLocaleDateString() : "No"} />
-        <InfoCard label="Joined" value={new Date(user.createdAt).toLocaleDateString()} />
+        <InfoCard label="Wallet balance" value={`₦${user.walletBalance.toLocaleString()}`} color="violet" icon={<WalletGlyph />} />
+        <InfoCard label="Phone" value={user.phone || "—"} color="sky" icon={<PhoneGlyph />} />
+        <InfoCard
+          label="Email verified"
+          value={user.emailVerifiedAt ? new Date(user.emailVerifiedAt).toLocaleDateString() : "No"}
+          color={user.emailVerifiedAt ? "emerald" : "amber"}
+          icon={<CheckGlyph />}
+        />
+        <InfoCard label="Joined" value={new Date(user.createdAt).toLocaleDateString()} color="rose" icon={<CalendarGlyph />} />
       </div>
 
       <AdminUserActions
@@ -94,7 +106,10 @@ export default async function AdminUserDetailPage({ params }: { params: { id: st
         <Table
           headers={["Service", "Country", "Number", "Charged", "Status", "Date"]}
           rows={user.orders.map((o) => [
-            o.serviceName,
+            <span key="svc" className="flex items-center gap-2">
+              <ServiceIcon name={o.serviceName} className="h-6 w-6 rounded-md" />
+              {o.serviceName}
+            </span>,
             o.countryName,
             o.number,
             `₦${o.costCharged.toLocaleString()}`,
@@ -122,7 +137,7 @@ export default async function AdminUserDetailPage({ params }: { params: { id: st
         <Table
           headers={["Type", "Amount", "Status", "Reference", "Date"]}
           rows={user.transactions.map((t) => [
-            t.type,
+            <TransactionTypeTag key="t" type={t.type} />,
             `₦${t.amount.toLocaleString()}`,
             <StatusBadge key="s" status={t.status} />,
             <span key="r" className="font-mono text-xs">{t.reference}</span>,
@@ -135,11 +150,24 @@ export default async function AdminUserDetailPage({ params }: { params: { id: st
   );
 }
 
-function InfoCard({ label, value }: { label: string; value: string }) {
+function InfoCard({
+  label,
+  value,
+  color,
+  icon,
+}: {
+  label: string;
+  value: string;
+  color: Parameters<typeof StatIcon>[0]["color"];
+  icon: React.ReactNode;
+}) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-ink-700 dark:bg-ink-900">
-      <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
-      <p className="mt-1 text-lg font-bold">{value}</p>
+    <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-ink-700 dark:bg-ink-900">
+      <StatIcon color={color}>{icon}</StatIcon>
+      <div>
+        <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
+        <p className="mt-1 text-lg font-bold">{value}</p>
+      </div>
     </div>
   );
 }

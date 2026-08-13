@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import StatusBadge from "@/components/admin/StatusBadge";
+import UserAvatar from "@/components/admin/UserAvatar";
+import ServiceIcon from "@/components/ServiceIcon";
 
 const PAGE_SIZE = 30;
 
@@ -104,13 +106,21 @@ export default async function AdminOrdersPage({
             {orders.map((o) => (
               <tr key={o.id} className="hover:bg-slate-50 dark:hover:bg-ink-800">
                 <td className="px-5 py-3.5">
-                  <Link href={`/admin/users/${o.user.id}`} className="block">
-                    <p className="font-medium text-slate-900 dark:text-paper-100">{o.user.name || "—"}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{o.user.email}</p>
+                  <Link href={`/admin/users/${o.user.id}`} className="flex items-center gap-3">
+                    <UserAvatar name={o.user.name} email={o.user.email} className="h-8 w-8 text-xs" />
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-paper-100">{o.user.name || "—"}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">{o.user.email}</p>
+                    </div>
                   </Link>
                 </td>
                 <td className="px-5 py-3.5 font-mono">{o.number}</td>
-                <td className="px-5 py-3.5 text-slate-600 dark:text-slate-400">{o.serviceName}</td>
+                <td className="px-5 py-3.5 text-slate-600 dark:text-slate-400">
+                  <div className="flex items-center gap-2">
+                    <ServiceIcon name={o.serviceName} className="h-6 w-6 rounded-md" />
+                    {o.serviceName}
+                  </div>
+                </td>
                 <td className="px-5 py-3.5 text-slate-600 dark:text-slate-400">{o.countryName}</td>
                 <td className="px-5 py-3.5 font-mono">₦{o.costCharged.toLocaleString()}</td>
                 <td className="px-5 py-3.5">

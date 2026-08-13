@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import StatIcon, { AlertGlyph, CoinsGlyph, HashGlyph, MailGlyph, UsersGlyph, WalletGlyph, type StatColor } from "@/components/admin/StatIcon";
+import UserAvatar from "@/components/admin/UserAvatar";
+import TransactionTypeTag from "@/components/admin/TransactionTypeTag";
 
 export default async function AdminOverviewPage() {
   const [
@@ -37,12 +40,23 @@ export default async function AdminOverviewPage() {
     }),
   ]);
 
-  const stats = [
-    { label: "Total users", value: userCount.toLocaleString(), href: "/admin/users" },
-    { label: "Total wallet balance held", value: `₦${(walletTotal._sum.walletBalance ?? 0).toLocaleString()}` },
-    { label: "Total top-ups received", value: `₦${(revenueTotal._sum.amount ?? 0).toLocaleString()}`, href: "/admin/transactions?type=topup&status=successful" },
-    { label: "Numbers purchased", value: ordersCount.toLocaleString(), href: "/admin/orders" },
-    { label: "Emails generated", value: emailsCount.toLocaleString(), href: "/admin/emails" },
+  const stats: { label: string; value: string; href?: string; color: StatColor; icon: React.ReactNode }[] = [
+    { label: "Total users", value: userCount.toLocaleString(), href: "/admin/users", color: "blue", icon: <UsersGlyph /> },
+    {
+      label: "Total wallet balance held",
+      value: `₦${(walletTotal._sum.walletBalance ?? 0).toLocaleString()}`,
+      color: "violet",
+      icon: <WalletGlyph />,
+    },
+    {
+      label: "Total top-ups received",
+      value: `₦${(revenueTotal._sum.amount ?? 0).toLocaleString()}`,
+      href: "/admin/transactions?type=topup&status=successful",
+      color: "emerald",
+      icon: <CoinsGlyph />,
+    },
+    { label: "Numbers purchased", value: ordersCount.toLocaleString(), href: "/admin/orders", color: "sky", icon: <HashGlyph /> },
+    { label: "Emails generated", value: emailsCount.toLocaleString(), href: "/admin/emails", color: "rose", icon: <MailGlyph /> },
   ];
 
   return (
@@ -55,9 +69,12 @@ export default async function AdminOverviewPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((s) => {
           const card = (
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors dark:border-ink-700 dark:bg-ink-900 dark:hover:bg-ink-800">
-              <p className="text-sm text-slate-500 dark:text-slate-400">{s.label}</p>
-              <p className="mt-1 text-2xl font-bold">{s.value}</p>
+            <div className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors dark:border-ink-700 dark:bg-ink-900 dark:hover:bg-ink-800">
+              <StatIcon color={s.color}>{s.icon}</StatIcon>
+              <div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{s.label}</p>
+                <p className="mt-1 text-2xl font-bold">{s.value}</p>
+              </div>
             </div>
           );
           return s.href ? (
@@ -72,15 +89,20 @@ export default async function AdminOverviewPage() {
 
       <Link
         href="/admin/transactions?status=unsuccessful&type=topup"
-        className="flex items-center justify-between rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-colors hover:bg-amber-100 dark:border-amber-500/30 dark:bg-amber-500/10 dark:hover:bg-amber-500/20"
+        className="flex items-center justify-between gap-4 rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm transition-colors hover:bg-amber-100 dark:border-amber-500/30 dark:bg-amber-500/10 dark:hover:bg-amber-500/20"
       >
-        <div>
-          <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Top-ups that didn&apos;t go through</p>
-          <p className="mt-1 text-xs text-amber-700/80 dark:text-amber-300/70">
-            People who tried adding funds but the payment never completed — pending or failed.
-          </p>
+        <div className="flex items-start gap-4">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-300">
+            <AlertGlyph />
+          </span>
+          <div>
+            <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Top-ups that didn&apos;t go through</p>
+            <p className="mt-1 text-xs text-amber-700/80 dark:text-amber-300/70">
+              People who tried adding funds but the payment never completed — pending or failed.
+            </p>
+          </div>
         </div>
-        <div className="text-right">
+        <div className="shrink-0 text-right">
           <p className="font-display text-2xl font-700 text-amber-800 dark:text-amber-300">
             {(unsuccessfulTopups._count ?? 0).toLocaleString()}
           </p>
@@ -103,13 +125,16 @@ export default async function AdminOverviewPage() {
               <Link
                 key={u.id}
                 href={`/admin/users/${u.id}`}
-                className="flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-ink-800"
+                className="flex items-center justify-between gap-3 px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-ink-800"
               >
-                <div>
-                  <p className="text-sm font-medium">{u.name || "—"}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{u.email}</p>
+                <div className="flex min-w-0 items-center gap-3">
+                  <UserAvatar name={u.name} email={u.email} />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{u.name || "—"}</p>
+                    <p className="truncate text-xs text-slate-500 dark:text-slate-400">{u.email}</p>
+                  </div>
                 </div>
-                <div className="text-right">
+                <div className="shrink-0 text-right">
                   <p className="text-sm font-mono">₦{u.walletBalance.toLocaleString()}</p>
                   <p className="text-xs text-slate-400">
                     {u.emailVerifiedAt ? "Verified" : "Unverified"} · {new Date(u.createdAt).toLocaleDateString()}
@@ -132,13 +157,16 @@ export default async function AdminOverviewPage() {
               <Link
                 key={t.id}
                 href={`/admin/users/${t.user.id}`}
-                className="flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-ink-800"
+                className="flex items-center justify-between gap-3 px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-ink-800"
               >
-                <div>
-                  <p className="text-sm font-medium capitalize">{t.type}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{t.user.email}</p>
+                <div className="flex min-w-0 items-center gap-3">
+                  <UserAvatar name={t.user.name} email={t.user.email} />
+                  <div className="min-w-0">
+                    <TransactionTypeTag type={t.type} />
+                    <p className="mt-1 truncate text-xs text-slate-500 dark:text-slate-400">{t.user.email}</p>
+                  </div>
                 </div>
-                <div className="text-right">
+                <div className="shrink-0 text-right">
                   <p className="text-sm font-mono">₦{t.amount.toLocaleString()}</p>
                   <p
                     className={`text-xs capitalize ${

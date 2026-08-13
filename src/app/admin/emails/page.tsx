@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import StatusBadge from "@/components/admin/StatusBadge";
+import UserAvatar from "@/components/admin/UserAvatar";
 
 const PAGE_SIZE = 30;
 
@@ -99,9 +100,12 @@ export default async function AdminEmailsPage({
             {emails.map((e) => (
               <tr key={e.id} className="hover:bg-slate-50 dark:hover:bg-ink-800">
                 <td className="px-5 py-3.5">
-                  <Link href={`/admin/users/${e.user.id}`} className="block">
-                    <p className="font-medium text-slate-900 dark:text-paper-100">{e.user.name || "—"}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{e.user.email}</p>
+                  <Link href={`/admin/users/${e.user.id}`} className="flex items-center gap-3">
+                    <UserAvatar name={e.user.name} email={e.user.email} className="h-8 w-8 text-xs" />
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-paper-100">{e.user.name || "—"}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">{e.user.email}</p>
+                    </div>
                   </Link>
                 </td>
                 <td className="max-w-[220px] truncate px-5 py-3.5 font-mono text-xs" title={e.address}>

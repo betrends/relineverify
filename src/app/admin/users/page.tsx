@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import UserAvatar from "@/components/admin/UserAvatar";
 
 const PAGE_SIZE = 25;
 
@@ -82,11 +83,14 @@ export default async function AdminUsersPage({
             {users.map((u) => (
               <tr key={u.id} className="hover:bg-slate-50 dark:hover:bg-ink-800">
                 <td className="px-5 py-3.5">
-                  <Link href={`/admin/users/${u.id}`} className="block">
-                    <p className="font-medium text-slate-900 dark:text-paper-100">
-                      {u.name || "—"} {u.isAdmin && <span className="ml-1 text-xs text-violet-500">(admin)</span>}
-                    </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{u.email}</p>
+                  <Link href={`/admin/users/${u.id}`} className="flex items-center gap-3">
+                    <UserAvatar name={u.name} email={u.email} className="h-9 w-9" />
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-paper-100">
+                        {u.name || "—"} {u.isAdmin && <span className="ml-1 text-xs text-violet-500">(admin)</span>}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">{u.email}</p>
+                    </div>
                   </Link>
                 </td>
                 <td className="px-5 py-3.5 text-slate-600 dark:text-slate-400">{u.phone || "—"}</td>

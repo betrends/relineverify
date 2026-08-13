@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import StatusBadge from "@/components/admin/StatusBadge";
+import TransactionTypeTag from "@/components/admin/TransactionTypeTag";
+import UserAvatar from "@/components/admin/UserAvatar";
 
 const PAGE_SIZE = 30;
 
@@ -153,12 +155,17 @@ export default async function AdminTransactionsPage({
             {transactions.map((t) => (
               <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-ink-800">
                 <td className="px-5 py-3.5">
-                  <Link href={`/admin/users/${t.user.id}`} className="block">
-                    <p className="font-medium text-slate-900 dark:text-paper-100">{t.user.name || "—"}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{t.user.email}</p>
+                  <Link href={`/admin/users/${t.user.id}`} className="flex items-center gap-3">
+                    <UserAvatar name={t.user.name} email={t.user.email} className="h-8 w-8 text-xs" />
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-paper-100">{t.user.name || "—"}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">{t.user.email}</p>
+                    </div>
                   </Link>
                 </td>
-                <td className="px-5 py-3.5 capitalize text-slate-600 dark:text-slate-400">{t.type}</td>
+                <td className="px-5 py-3.5">
+                  <TransactionTypeTag type={t.type} />
+                </td>
                 <td className="px-5 py-3.5 font-mono">₦{t.amount.toLocaleString()}</td>
                 <td className="px-5 py-3.5">
                   <StatusBadge status={t.status} />
