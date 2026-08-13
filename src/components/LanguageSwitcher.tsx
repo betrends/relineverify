@@ -51,7 +51,7 @@ export default function LanguageSwitcher({ className = "" }: { className?: strin
         <ChevronIcon className={`transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="absolute right-0 z-30 mt-2 w-40 overflow-hidden rounded-xl border border-slate-100 bg-white py-1 shadow-lg dark:border-ink-800 dark:bg-ink-900">
+        <div className="absolute right-0 z-30 mt-2 w-40 overflow-hidden rounded-xl border border-violet-100/60 bg-white/85 py-1 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/70">
           {locales.map((code) => (
             <button
               key={code}

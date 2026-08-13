@@ -132,7 +132,7 @@ export default function Combobox({
       )}
 
       {open && (
-        <div className="absolute z-20 mt-1.5 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-ink-700 dark:bg-ink-900">
+        <div className="absolute z-20 mt-1.5 w-full overflow-hidden rounded-xl border border-violet-100/60 bg-white/85 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-ink-900/70">
           <input
             ref={inputRef}
             value={query}
