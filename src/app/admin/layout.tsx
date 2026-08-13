@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { getCurrentUser } from "@/lib/currentUser";
-import ThemeToggleButton from "@/components/ThemeToggleButton";
+import { MobileNavProvider } from "@/components/dashboard/MobileNavProvider";
+import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminTopBar from "@/components/admin/AdminTopBar";
 
 // Every /admin/* page is gated here — checked server-side on every request,
 // so there's no client-side route to spoof around. Not an authorization
@@ -13,39 +14,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!user.isAdmin) redirect("/dashboard");
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-ink-950 dark:text-paper-100">
-      <header className="border-b border-slate-200 bg-white dark:border-ink-800 dark:bg-ink-900">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-6">
-            <Link href="/admin" className="flex items-center gap-2 font-display text-lg font-700">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500 text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="16" height="16">
-                  <path d="M11 3 5 12h4.2l-.8 5 6.6-9h-4.2l.8-5Z" fill="white" />
-                </svg>
-              </span>
-              Reline Admin
-            </Link>
-            <nav className="flex items-center gap-4 text-sm font-medium text-slate-500 dark:text-slate-400">
-              <Link href="/admin" className="hover:text-slate-900 dark:hover:text-paper-100">
-                Overview
-              </Link>
-              <Link href="/admin/users" className="hover:text-slate-900 dark:hover:text-paper-100">
-                Users
-              </Link>
-              <Link href="/admin/broadcast" className="hover:text-slate-900 dark:hover:text-paper-100">
-                Broadcast
-              </Link>
-            </nav>
-          </div>
-          <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
-            <ThemeToggleButton />
-            <Link href="/dashboard" className="hover:text-slate-900 dark:hover:text-paper-100">
-              Back to app
-            </Link>
-          </div>
+    <MobileNavProvider>
+      <div className="flex min-h-screen bg-slate-50 text-slate-900 dark:bg-ink-950 dark:text-paper-100">
+        <AdminSidebar />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <AdminTopBar />
+          <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-8">{children}</main>
         </div>
-      </header>
-      <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
-    </div>
+      </div>
+    </MobileNavProvider>
   );
 }

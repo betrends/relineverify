@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import AdminUserActions from "@/components/admin/AdminUserActions";
+import StatusBadge from "@/components/admin/StatusBadge";
 
 export default async function AdminUserDetailPage({ params }: { params: { id: string } }) {
   const user = await prisma.user.findUnique({
@@ -89,7 +90,7 @@ export default async function AdminUserDetailPage({ params }: { params: { id: st
         </Section>
       )}
 
-      <Section title={`Numbers purchased (${user.orders.length})`}>
+      <Section title={`Numbers purchased (${user.orders.length})`} viewAllHref={`/admin/orders?q=${encodeURIComponent(user.email)}`}>
         <Table
           headers={["Service", "Country", "Number", "Charged", "Status", "Date"]}
           rows={user.orders.map((o) => [
@@ -104,7 +105,7 @@ export default async function AdminUserDetailPage({ params }: { params: { id: st
         />
       </Section>
 
-      <Section title={`Emails generated (${user.generatedEmails.length})`}>
+      <Section title={`Emails generated (${user.generatedEmails.length})`} viewAllHref={`/admin/emails?q=${encodeURIComponent(user.email)}`}>
         <Table
           headers={["Address", "Charged", "Status", "Date"]}
           rows={user.generatedEmails.map((e) => [
@@ -117,7 +118,7 @@ export default async function AdminUserDetailPage({ params }: { params: { id: st
         />
       </Section>
 
-      <Section title={`Transactions (${user.transactions.length})`}>
+      <Section title={`Transactions (${user.transactions.length})`} viewAllHref={`/admin/transactions?q=${encodeURIComponent(user.email)}`}>
         <Table
           headers={["Type", "Amount", "Status", "Reference", "Date"]}
           rows={user.transactions.map((t) => [
@@ -143,11 +144,24 @@ function InfoCard({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  viewAllHref,
+  children,
+}: {
+  title: string;
+  viewAllHref?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-ink-700 dark:bg-ink-900">
-      <div className="border-b border-slate-100 px-5 py-4 dark:border-ink-800">
+      <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 dark:border-ink-800">
         <h2 className="font-display text-lg font-700">{title}</h2>
+        {viewAllHref && (
+          <Link href={viewAllHref} className="text-sm font-medium text-violet-600 hover:underline dark:text-violet-300">
+            View all
+          </Link>
+        )}
       </div>
       {children}
     </div>
@@ -183,22 +197,5 @@ function Table({ headers, rows, empty }: { headers: string[]; rows: React.ReactN
         </tbody>
       </table>
     </div>
-  );
-}
-
-const STATUS_STYLES: Record<string, string> = {
-  received: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300",
-  successful: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300",
-  pending: "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300",
-  cancelled: "bg-slate-100 text-slate-500 dark:bg-ink-800 dark:text-slate-400",
-  expired: "bg-slate-100 text-slate-500 dark:bg-ink-800 dark:text-slate-400",
-  failed: "bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-300",
-};
-
-function StatusBadge({ status }: { status: string }) {
-  return (
-    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[status] || "bg-slate-100 text-slate-500"}`}>
-      {status}
-    </span>
   );
 }
