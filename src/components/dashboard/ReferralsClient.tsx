@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { track } from "@vercel/analytics";
 import Reveal from "../motion/Reveal";
 import HoverLift from "../motion/HoverLift";
 import MotionButton from "../motion/MotionButton";
@@ -41,6 +42,7 @@ export default function ReferralsClient() {
     navigator.clipboard.writeText(text).then(() => {
       setCopied(what);
       setTimeout(() => setCopied(null), 1500);
+      track("referral_share", { what });
     });
   }
 

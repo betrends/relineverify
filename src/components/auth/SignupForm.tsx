@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { track } from "@vercel/analytics";
 import { useTranslations } from "next-intl";
 import MotionButton from "../motion/MotionButton";
 import AnimatedError from "../motion/AnimatedError";
@@ -67,6 +68,7 @@ export default function SignupForm() {
         setError(json.error || tc("errorGeneric"));
         return;
       }
+      track("signup", { method: "email", referred: Boolean(referralCode) });
       router.push("/dashboard");
       router.refresh();
     } finally {
@@ -219,6 +221,7 @@ export default function SignupForm() {
 
           <a
             href={referralCode ? `/api/auth/google?ref=${encodeURIComponent(referralCode)}` : "/api/auth/google"}
+            onClick={() => track("signup_started", { method: "google", referred: Boolean(referralCode) })}
             className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 focus-ring dark:border-ink-700 dark:text-slate-300 dark:hover:bg-ink-800"
           >
             <GoogleLogo />

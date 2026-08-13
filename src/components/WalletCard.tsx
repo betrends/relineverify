@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { track } from "@vercel/analytics";
 import MotionButton from "./motion/MotionButton";
 import AnimatedError from "./motion/AnimatedError";
 import HoverLift from "./motion/HoverLift";
@@ -38,6 +39,7 @@ export default function WalletCard() {
         setError(json.error || t("errorGeneric"));
         return;
       }
+      track("topup_initiated", { amount });
       window.location.href = json.link;
     } finally {
       setLoading(false);
