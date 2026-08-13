@@ -57,7 +57,7 @@ export default function WalletCard() {
               setAmount(preset);
               setPrefillNote(null);
             }}
-            className={`rounded-xl border py-2 font-mono text-sm transition-colors focus-ring ${
+            className={`min-w-0 rounded-xl border py-2 font-mono text-xs transition-colors focus-ring sm:text-sm ${
               amount === preset
                 ? "border-violet-500 bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-300"
                 : "border-slate-200 text-slate-500 hover:border-slate-300 dark:border-ink-700 dark:text-slate-400 dark:hover:border-slate-500"

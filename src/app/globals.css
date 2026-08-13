@@ -12,7 +12,20 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Matches the light theme by default (the site's default look) so any
+   iOS rubber-band overscroll or edge-case overflow shows the right
+   color instead of a leftover dark-navy sliver. ThemeProvider keeps
+   this in sync with the active theme at runtime. */
 body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* The "dark" class lives on a wrapper div inside body (see
+   ThemeProvider), not on body/html itself, so a plain ".dark body"
+   ancestor selector would never match — :has() reaches down into body
+   for its dark-mode child instead. */
+body:has(.dark) {
   background-color: #0b0e1a;
   color: #edeef7;
 }

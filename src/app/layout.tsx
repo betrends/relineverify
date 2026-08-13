@@ -70,7 +70,7 @@ export default async function RootLayout({
       lang={locale}
       className={`${display.variable} ${body.variable} ${mono.variable} ${serif.variable}`}
     >
-      <body className="font-body bg-ink-950 text-paper-100 antialiased">
+      <body className="font-body antialiased">
         <ServiceWorkerRegister />
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
