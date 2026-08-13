@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import OtpReadout from "./OtpReadout";
@@ -41,13 +41,10 @@ const STATUS_BADGE: Record<Order["status"], string> = {
   expired: "bg-slate-100 text-slate-500 dark:bg-ink-800 dark:text-slate-500",
 };
 
-export default function OrderCard({
-  order: initial,
-  onChange,
-}: {
+const OrderCard = forwardRef<HTMLDivElement, {
   order: Order;
   onChange?: (order: Order) => void;
-}) {
+}>(function OrderCard({ order: initial, onChange }, ref) {
   const t = useTranslations("dashboard.orderCard");
   const [order, setOrder] = useState(initial);
   const [canCancel, setCanCancel] = useState(false);
@@ -118,6 +115,7 @@ export default function OrderCard({
 
   return (
     <motion.div
+      ref={ref}
       layout
       initial={{ opacity: 0, y: 14, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -222,4 +220,6 @@ export default function OrderCard({
       </div>
     </motion.div>
   );
-}
+});
+
+export default OrderCard;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import OtpReadout from "./OtpReadout";
@@ -37,13 +37,10 @@ const STATUS_BADGE: Record<GeneratedEmail["status"], string> = {
   cancelled: "bg-slate-100 text-slate-500 dark:bg-ink-800 dark:text-slate-500",
 };
 
-export default function EmailCard({
-  email: initial,
-  onChange,
-}: {
+const EmailCard = forwardRef<HTMLDivElement, {
   email: GeneratedEmail;
   onChange?: (email: GeneratedEmail) => void;
-}) {
+}>(function EmailCard({ email: initial, onChange }, ref) {
   const t = useTranslations("dashboard.emailCard");
   const [email, setEmail] = useState(initial);
   const [copied, setCopied] = useState<"address" | "code" | null>(null);
@@ -127,6 +124,7 @@ export default function EmailCard({
 
   return (
     <motion.div
+      ref={ref}
       layout
       initial={{ opacity: 0, y: 14, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -243,7 +241,9 @@ export default function EmailCard({
       </div>
     </motion.div>
   );
-}
+});
+
+export default EmailCard;
 
 function MailIcon() {
   return (
