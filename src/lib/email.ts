@@ -125,6 +125,49 @@ export async function sendWelcomeEmail(to: string, params: { name: string | null
   return { devMode: false as const };
 }
 
+// Admin broadcast — one subject/message sent to many recipients at once.
+// Resend's batch endpoint accepts up to 100 emails per call, so callers are
+// expected to chunk their recipient list into groups of <=100 and call this
+// once per chunk (see /api/admin/broadcast).
+export async function sendBroadcastEmailBatch(
+  recipients: string[],
+  params: { subject: string; message: string }
+) {
+  const resend = getClient();
+  const from = process.env.EMAIL_FROM || "Reline <onboarding@resend.dev>";
+
+  if (!resend) {
+    console.log(`[email] RESEND_API_KEY not set. Broadcast "${params.subject}" skipped for ${recipients.length} recipients.`);
+    return { devMode: true as const, sent: 0 };
+  }
+  if (recipients.length === 0) return { devMode: false as const, sent: 0 };
+
+  const subject = escapeHtml(params.subject);
+  // Message is plain text from an admin textarea — escape it, then turn
+  // blank-line-separated paragraphs into <p> tags so basic formatting survives.
+  const bodyHtml = escapeHtml(params.message)
+    .split(/\n{2,}/)
+    .map((para) => `<p style="color: #475569; line-height: 1.6; white-space: pre-wrap;">${para}</p>`)
+    .join("");
+
+  const html = `
+    <div style="font-family: -apple-system, sans-serif; max-width: 480px; margin: 0 auto;">
+      <h2 style="color: #0f172a;">${subject}</h2>
+      ${bodyHtml}
+      <p style="color: #94a3b8; font-size: 13px; margin-top: 24px;">
+        You're receiving this because you have a Reline account.
+      </p>
+    </div>
+  `;
+
+  const { data, error } = await resend.batch.send(
+    recipients.map((to) => ({ from, to, subject: params.subject, html }))
+  );
+
+  if (error) throw new Error(error.message);
+  return { devMode: false as const, sent: data?.data?.length ?? recipients.length };
+}
+
 export async function sendVerificationEmail(to: string, verifyUrl: string) {
   const resend = getClient();
   const from = process.env.EMAIL_FROM || "Reline <onboarding@resend.dev>";
