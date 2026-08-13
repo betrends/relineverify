@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Reveal from "./motion/Reveal";
 import ServiceIcon from "./ServiceIcon";
+import { slugify } from "@/lib/slugify";
 
 type Platform = { id: string; name: string };
 
@@ -63,7 +64,7 @@ export default function PlatformsGrid() {
             {filtered.map((p) => (
               <Link
                 key={p.id}
-                href="/signup"
+                href={`/services/${slugify(p.name)}`}
                 className="flex items-center gap-3 rounded-xl border border-violet-100 bg-white/70 px-4 py-3 shadow-sm backdrop-blur-xl transition-colors hover:border-violet-300 hover:bg-violet-50/60 focus-ring dark:border-white/10 dark:bg-ink-900/50 dark:hover:border-violet-500/40 dark:hover:bg-violet-500/10"
               >
                 <ServiceIcon name={p.name} className="h-9 w-9" />

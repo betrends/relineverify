@@ -7,6 +7,7 @@ import SiteFooter from "@/components/SiteFooter";
 import PageBackdrop from "@/components/motion/PageBackdrop";
 import Reveal from "@/components/motion/Reveal";
 import { countryCodeToFlag } from "@/lib/countryFlag";
+import { slugify } from "@/lib/slugify";
 
 type Country = { id: string; name: string; code: string };
 
@@ -68,7 +69,7 @@ export default function CountriesPage() {
               {filtered.map((c, i) => (
                 <Reveal key={c.id} delay={Math.min(i * 0.02, 0.3)}>
                   <Link
-                    href="/signup"
+                    href={`/countries/${slugify(c.name)}`}
                     className="flex items-center gap-3 rounded-xl border border-violet-100 bg-white/70 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm backdrop-blur-xl transition-colors hover:border-violet-300 hover:bg-violet-50/60 focus-ring dark:border-white/10 dark:bg-ink-900/50 dark:text-paper-100 dark:hover:border-violet-500/40 dark:hover:bg-violet-500/10"
                   >
                     <span className="text-xl leading-none">{countryCodeToFlag(c.code)}</span>
