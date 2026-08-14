@@ -7,17 +7,17 @@ import PageBackdrop from "@/components/motion/PageBackdrop";
 import Reveal from "@/components/motion/Reveal";
 import StepBadge from "@/components/motion/StepBadge";
 import ServiceIcon from "@/components/ServiceIcon";
-import { getServiceLanding, getPopularServiceSlugs } from "@/lib/seoLanding";
+import { getServiceLanding } from "@/lib/seoLanding";
 
-export const revalidate = 3600;
-export const dynamicParams = true;
+// Can't be statically generated (SSG/ISR): this app resolves i18n locale
+// via cookies() in the root layout (see src/i18n/request.ts), which forces
+// every page — including this one — to render dynamically per request.
+// Attempting generateStaticParams here built fine but crashed at runtime
+// in production (DYNAMIC_SERVER_USAGE). getServiceLanding itself is
+// bounded by a timeout (see lib/seoLanding.ts) so a slow upstream call
+// degrades to a 404 instead of hanging the request.
 
 const appUrl = process.env.APP_URL || "http://localhost:3000";
-
-export async function generateStaticParams() {
-  const slugs = await getPopularServiceSlugs(40).catch(() => []);
-  return slugs.map((slug) => ({ slug }));
-}
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const data = await getServiceLanding(params.slug).catch(() => null);

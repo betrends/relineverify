@@ -14,12 +14,28 @@ export { slugify };
 
 const SERVER = AVAILABLE_SERVERS[0];
 
-// A handful of countries to sample when we need "what services exist at
-// all" without fetching every country's full catalog (some have hundreds
-// of countries, and each services call is its own slow upstream request).
+// Talktiyu's catalog endpoint is genuinely slow in practice — we measured
+// single calls taking anywhere from 5s to 2+ minutes. These pages render
+// dynamically per request (see the page files for why), so an unbounded
+// wait here would risk hanging — or outright failing — a real visitor's
+// or crawler's request. Bounding every call means a slow upstream degrades
+// to "page not found" rather than a hung or crashed request; a retry a
+// minute later usually succeeds once the in-memory catalog cache is warm.
+const CATALOG_TIMEOUT_MS = 8000;
+
+function withTimeout<T>(promise: Promise<T>, ms = CATALOG_TIMEOUT_MS): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error("Catalog lookup timed out")), ms)),
+  ]);
+}
+
 async function sampleCountries(): Promise<TalktiyuCountry[]> {
-  const countries = await getCountries(SERVER);
-  return countries;
+  return withTimeout(getCountries(SERVER));
+}
+
+async function servicesFor(countryId: string): Promise<TalktiyuService[]> {
+  return withTimeout(getServices(SERVER, countryId));
 }
 
 function preferredPricingCountry(countries: TalktiyuCountry[]): TalktiyuCountry | undefined {
@@ -32,23 +48,18 @@ export type ServiceLanding = {
   countryCount: number;
 };
 
-// Talktiyu's catalog endpoint is genuinely slow in practice — we measured
-// single calls taking anywhere from 5s to 2+ minutes. That's tolerable for
-// a one-time build/ISR-regeneration cost (see `revalidate` below, and note
-// that generateStaticParams covers the popular slugs at build time so real
-// visitors almost never hit a live call at all) but NOT something a page
-// can afford to do more than once. So: check Nigeria only, single call, no
-// multi-country fallback fan-out — a service that only exists outside
-// Nigeria just won't get a dedicated landing page, which is an acceptable
-// trade-off given our audience is overwhelmingly Nigerian anyway.
+// Checks Nigeria only, single call, no multi-country fallback fan-out — a
+// service that only exists outside Nigeria just won't get a dedicated
+// landing page, which is an acceptable trade-off given our audience is
+// overwhelmingly Nigerian anyway (and keeps this to one bounded call).
 export async function getServiceLanding(slug: string): Promise<ServiceLanding | null> {
-  const countries = await sampleCountries();
+  const countries = await sampleCountries().catch(() => []);
   const priceCountry = preferredPricingCountry(countries);
   if (!priceCountry) return null;
 
   let services: TalktiyuService[];
   try {
-    services = await getServices(SERVER, priceCountry.id);
+    services = await servicesFor(priceCountry.id);
   } catch {
     return null;
   }
@@ -59,10 +70,10 @@ export async function getServiceLanding(slug: string): Promise<ServiceLanding | 
 }
 
 export async function getPopularServiceSlugs(limit = 40): Promise<string[]> {
-  const countries = await sampleCountries();
+  const countries = await sampleCountries().catch(() => []);
   const priceCountry = preferredPricingCountry(countries);
   if (!priceCountry) return [];
-  const services = await getServices(SERVER, priceCountry.id);
+  const services = await servicesFor(priceCountry.id).catch(() => []);
   const seen = new Set<string>();
   const slugs: string[] = [];
   for (const s of services) {
@@ -95,13 +106,13 @@ const POPULAR_SERVICE_NAMES = [
 ];
 
 export async function getCountryLanding(slug: string): Promise<CountryLanding | null> {
-  const countries = await sampleCountries();
+  const countries = await sampleCountries().catch(() => []);
   const country = countries.find((c) => slugify(c.name) === slug);
   if (!country) return null;
 
   let services: TalktiyuService[];
   try {
-    services = await getServices(SERVER, country.id);
+    services = await servicesFor(country.id);
   } catch {
     services = [];
   }
@@ -121,6 +132,6 @@ export async function getCountryLanding(slug: string): Promise<CountryLanding | 
 }
 
 export async function getPopularCountrySlugs(limit = 60): Promise<string[]> {
-  const countries = await sampleCountries();
+  const countries = await sampleCountries().catch(() => []);
   return countries.slice(0, limit).map((c) => slugify(c.name));
 }

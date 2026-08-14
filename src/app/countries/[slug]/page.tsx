@@ -8,17 +8,13 @@ import Reveal from "@/components/motion/Reveal";
 import StepBadge from "@/components/motion/StepBadge";
 import ServiceIcon from "@/components/ServiceIcon";
 import { countryCodeToFlag } from "@/lib/countryFlag";
-import { getCountryLanding, getPopularCountrySlugs, slugify } from "@/lib/seoLanding";
+import { getCountryLanding, slugify } from "@/lib/seoLanding";
 
-export const revalidate = 3600;
-export const dynamicParams = true;
+// See services/[slug]/page.tsx — can't be statically generated because
+// cookies()-based i18n locale resolution in the root layout forces every
+// page to render dynamically per request.
 
 const appUrl = process.env.APP_URL || "http://localhost:3000";
-
-export async function generateStaticParams() {
-  const slugs = await getPopularCountrySlugs(60).catch(() => []);
-  return slugs.map((slug) => ({ slug }));
-}
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const data = await getCountryLanding(params.slug).catch(() => null);
