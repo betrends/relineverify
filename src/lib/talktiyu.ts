@@ -105,6 +105,43 @@ export function getCountries(server: string) {
   );
 }
 
+// Cached variants for the public SEO landing pages (services/[slug],
+// countries/[slug]) — those pages don't need second-by-second accuracy
+// the way the live buy flow does, and critically can't rely on the
+// in-memory cachedCatalog() above surviving between requests, since each
+// serverless invocation may be a fresh, empty-cache instance. Using
+// Next's `next: { revalidate }` fetch option instead stores the result in
+// Vercel's persistent Data Cache, which *does* survive across
+// invocations — so only the very first request after a deploy (or after
+// the revalidate window lapses) pays the slow upstream cost.
+async function requestCached<T>(path: string): Promise<T> {
+  const apiKey = process.env.TALKTIYU_API_KEY;
+  if (!apiKey) throw new Error("TALKTIYU_API_KEY is not set");
+
+  const res = await fetch(`${BASE_URL}${path}`, {
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    next: { revalidate: 3600 },
+  });
+  const json = await res.json().catch(() => null);
+  if (!res.ok || !json || json.status === "0") {
+    const message = json?.error || `Talktiyu request failed (${res.status})`;
+    throw new TalktiyuError(message, res.status);
+  }
+  return json as T;
+}
+
+export function getCountriesCached(server: string) {
+  return requestCached<{ status: string; data: TalktiyuCountry[] }>(
+    `/api/reseller/countries?server=${encodeURIComponent(server)}`
+  ).then((r) => r.data);
+}
+
+export function getServicesCached(server: string, country: string) {
+  return requestCached<{ status: string; data: TalktiyuService[] }>(
+    `/api/reseller/services?server=${encodeURIComponent(server)}&country=${encodeURIComponent(country)}`
+  ).then((r) => r.data);
+}
+
 export function getServices(server: string, country: string) {
   return cachedCatalog(`services:${server}:${country}`, () =>
     request<{ status: string; data: TalktiyuService[] }>(

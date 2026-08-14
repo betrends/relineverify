@@ -15,7 +15,10 @@ import { getServiceLanding } from "@/lib/seoLanding";
 // Attempting generateStaticParams here built fine but crashed at runtime
 // in production (DYNAMIC_SERVER_USAGE). getServiceLanding itself is
 // bounded by a timeout (see lib/seoLanding.ts) so a slow upstream call
-// degrades to a 404 instead of hanging the request.
+// degrades to a 404 instead of hanging the request — maxDuration gives it
+// real room to succeed on an uncached first hit instead of being cut off
+// by Vercel's default function timeout before that inner timeout fires.
+export const maxDuration = 60;
 
 const appUrl = process.env.APP_URL || "http://localhost:3000";
 

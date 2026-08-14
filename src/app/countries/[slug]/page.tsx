@@ -12,7 +12,9 @@ import { getCountryLanding, slugify } from "@/lib/seoLanding";
 
 // See services/[slug]/page.tsx — can't be statically generated because
 // cookies()-based i18n locale resolution in the root layout forces every
-// page to render dynamically per request.
+// page to render dynamically per request. maxDuration gives an uncached
+// first hit real room to complete (see lib/seoLanding.ts for the timeout).
+export const maxDuration = 60;
 
 const appUrl = process.env.APP_URL || "http://localhost:3000";
 

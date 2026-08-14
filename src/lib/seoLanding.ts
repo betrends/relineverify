@@ -1,12 +1,15 @@
 /**
  * Data helpers for the programmatic SEO landing pages
- * (/services/[slug], /countries/[slug]). Built on top of the existing
- * talktiyu.ts client, which already keeps a 30-minute in-memory cache
- * on the catalog endpoints — good enough for marketing pages that
- * don't need second-by-second price accuracy (the buy flow itself
- * always re-checks live price at order time).
+ * (/services/[slug], /countries/[slug]).
+ *
+ * Uses talktiyu.ts's getCountriesCached/getServicesCached, which persist
+ * results in Vercel's Data Cache (survives across serverless
+ * invocations) rather than the authenticated client's in-memory-only
+ * cache — important because these pages render dynamically per request
+ * (see the page files for why) and can't rely on a warm in-process cache
+ * the way a long-lived server could.
  */
-import { AVAILABLE_SERVERS, getCountries, getServices, type TalktiyuCountry, type TalktiyuService } from "./talktiyu";
+import { AVAILABLE_SERVERS, getCountriesCached, getServicesCached, type TalktiyuCountry, type TalktiyuService } from "./talktiyu";
 import { applyMarkup } from "./pricing";
 import { slugify } from "./slugify";
 
@@ -15,13 +18,12 @@ export { slugify };
 const SERVER = AVAILABLE_SERVERS[0];
 
 // Talktiyu's catalog endpoint is genuinely slow in practice — we measured
-// single calls taking anywhere from 5s to 2+ minutes. These pages render
-// dynamically per request (see the page files for why), so an unbounded
-// wait here would risk hanging — or outright failing — a real visitor's
-// or crawler's request. Bounding every call means a slow upstream degrades
-// to "page not found" rather than a hung or crashed request; a retry a
-// minute later usually succeeds once the in-memory catalog cache is warm.
-const CATALOG_TIMEOUT_MS = 8000;
+// single calls taking anywhere from 5s to 2+ minutes. Combined with the
+// page-level `maxDuration = 60` export, this bounds the worst case (an
+// uncached first request after a deploy) to a real attempt at succeeding
+// rather than a hung request, while still guaranteeing a response before
+// the serverless function itself would be killed.
+const CATALOG_TIMEOUT_MS = 45_000;
 
 function withTimeout<T>(promise: Promise<T>, ms = CATALOG_TIMEOUT_MS): Promise<T> {
   return Promise.race([
@@ -31,11 +33,11 @@ function withTimeout<T>(promise: Promise<T>, ms = CATALOG_TIMEOUT_MS): Promise<T
 }
 
 async function sampleCountries(): Promise<TalktiyuCountry[]> {
-  return withTimeout(getCountries(SERVER));
+  return withTimeout(getCountriesCached(SERVER));
 }
 
 async function servicesFor(countryId: string): Promise<TalktiyuService[]> {
-  return withTimeout(getServices(SERVER, countryId));
+  return withTimeout(getServicesCached(SERVER, countryId));
 }
 
 function preferredPricingCountry(countries: TalktiyuCountry[]): TalktiyuCountry | undefined {

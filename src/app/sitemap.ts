@@ -4,8 +4,10 @@ import { getPopularServiceSlugs, getPopularCountrySlugs } from "@/lib/seoLanding
 // The upstream catalog API this depends on is slow (see seoLanding.ts) —
 // without this, sitemap.xml would re-run those calls on every single
 // request instead of serving a cached copy, and Search Console expects a
-// sitemap to respond quickly.
+// sitemap to respond quickly. maxDuration gives a cache-cold regeneration
+// enough room to actually finish rather than being cut off mid-fetch.
 export const revalidate = 3600;
+export const maxDuration = 60;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const appUrl = process.env.APP_URL || "http://localhost:3000";
