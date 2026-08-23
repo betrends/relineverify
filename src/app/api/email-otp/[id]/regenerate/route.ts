@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { rateLimitOrNull } from "@/lib/rateLimit";
-import { CODE_EXPIRY_MS } from "@/lib/codeExpiry";
+import { EMAIL_CODE_EXPIRY_MS } from "@/lib/codeExpiry";
 
 const REGENERATE_COST = 1000;
 
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   if (record.status !== "received") {
     return NextResponse.json({ error: "This email isn't ready for a new code yet" }, { status: 400 });
   }
-  if (Date.now() - record.updatedAt.getTime() < CODE_EXPIRY_MS) {
+  if (Date.now() - record.updatedAt.getTime() < EMAIL_CODE_EXPIRY_MS) {
     return NextResponse.json({ error: "The current code hasn't expired yet" }, { status: 400 });
   }
 

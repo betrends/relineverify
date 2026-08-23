@@ -76,19 +76,10 @@ export default function DashboardClient() {
     <div className="space-y-8">
       <StatsStrip orders={orders} emails={emails} />
 
-      <div className="grid gap-8 lg:grid-cols-[380px_1fr]">
+      <div className="grid gap-8 lg:grid-cols-[420px_1fr]">
         <div className="space-y-6">
           <Reveal>
             <BuyNumberForm onBought={handleBought} />
-          </Reveal>
-          <Reveal delay={0.05}>
-            <EmailGenerateForm onGenerated={handleGenerated} />
-          </Reveal>
-        </div>
-
-        <div className="space-y-8">
-          <Reveal delay={0.1}>
-            <WalletCard />
           </Reveal>
 
           <section id="active-orders">
@@ -107,7 +98,7 @@ export default function DashboardClient() {
                 description={t("noActiveNumbersDesc")}
               />
             ) : (
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="mt-4 grid gap-4">
                 <AnimatePresence mode="popLayout">
                   {active.map((order) => (
                     <OrderCard key={order.id} order={order} onChange={handleOrderChange} />
@@ -116,6 +107,10 @@ export default function DashboardClient() {
               </div>
             )}
           </section>
+
+          <Reveal delay={0.05}>
+            <EmailGenerateForm onGenerated={handleGenerated} />
+          </Reveal>
 
           <section id="generated-emails">
             <h2 className="font-display text-lg font-700 text-slate-900 dark:text-paper-100">{t("activeEmails")}</h2>
@@ -126,7 +121,7 @@ export default function DashboardClient() {
                 description={t("noActiveEmailsDesc")}
               />
             ) : (
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="mt-4 grid gap-4">
                 <AnimatePresence mode="popLayout">
                   {activeEmails.map((email) => (
                     <EmailCard key={email.id} email={email} onChange={handleEmailChange} />
@@ -135,6 +130,12 @@ export default function DashboardClient() {
               </div>
             )}
           </section>
+        </div>
+
+        <div className="space-y-8">
+          <Reveal delay={0.1}>
+            <WalletCard />
+          </Reveal>
 
           <section id="history">
             <h2 className="font-display text-lg font-700 text-slate-900 dark:text-paper-100">{t("history")}</h2>

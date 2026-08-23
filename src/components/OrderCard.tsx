@@ -8,6 +8,7 @@ import ServiceIcon from "./ServiceIcon";
 import MotionButton from "./motion/MotionButton";
 import { refreshWallet } from "@/lib/walletEvents";
 import { extractCode } from "@/lib/extractCode";
+import { stripHtml } from "@/lib/stripHtml";
 import { useCodeExpiry, formatRemaining } from "@/lib/useCodeExpiry";
 import { playCodeReceivedSound } from "@/lib/notificationSound";
 
@@ -165,17 +166,22 @@ const OrderCard = forwardRef<HTMLDivElement, {
           ) : (
             (() => {
               const code = extractCode(order.smsText);
+              const cleanText = stripHtml(order.smsText);
               return (
                 <>
-                  <OtpReadout
-                    resolved={code || order.smsText || ""}
-                    length={6}
-                    className="text-2xl text-emerald-600 dark:text-mint-400"
-                  />
-                  {/* Only show the raw message when it's distinct from what's already
-                      shown above — extractCode() falls back to the full text when it
-                      can't find a code, so re-printing it here would just duplicate it. */}
-                  {code && <p className="mt-2 text-xs text-slate-500">{order.smsText}</p>}
+                  {code ? (
+                    <>
+                      <OtpReadout resolved={code} length={6} className="text-2xl text-emerald-600 dark:text-mint-400" />
+                      {cleanText && cleanText !== code && (
+                        <p className="mt-2 line-clamp-2 text-xs text-slate-500">{cleanText}</p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm text-slate-500">{t("noCodeFound")}</p>
+                      {cleanText && <p className="mt-2 line-clamp-3 text-xs text-slate-500">{cleanText}</p>}
+                    </>
+                  )}
                   <p className="mt-1 font-mono text-[11px] text-amber-600 dark:text-amber-400">
                     {t("expiresIn", { time: formatRemaining(remainingMs) })}
                   </p>
@@ -199,9 +205,9 @@ const OrderCard = forwardRef<HTMLDivElement, {
         >
           {copied === "number" ? t("copied") : t("copyNumber")}
         </MotionButton>
-        {order.status === "received" && !codeExpired && (
+        {order.status === "received" && !codeExpired && extractCode(order.smsText) && (
           <MotionButton
-            onClick={() => copy(extractCode(order.smsText) || order.smsText || "", "code")}
+            onClick={() => copy(extractCode(order.smsText) || "", "code")}
             className="flex-1 rounded-full border border-emerald-200 bg-emerald-50 py-2 text-xs text-emerald-600 hover:bg-emerald-100 transition-colors focus-ring dark:border-mint-500/30 dark:bg-mint-500/10 dark:text-mint-400 dark:hover:bg-mint-500/20"
           >
             {copied === "code" ? t("copied") : t("copyCode")}

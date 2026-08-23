@@ -7,7 +7,9 @@ import OtpReadout from "./OtpReadout";
 import MotionButton from "./motion/MotionButton";
 import AnimatedError from "./motion/AnimatedError";
 import { extractCode } from "@/lib/extractCode";
+import { stripHtml } from "@/lib/stripHtml";
 import { useCodeExpiry, formatRemaining } from "@/lib/useCodeExpiry";
+import { EMAIL_CODE_EXPIRY_MS } from "@/lib/codeExpiry";
 import { refreshWallet, prefillTopupAmount } from "@/lib/walletEvents";
 import { playCodeReceivedSound } from "@/lib/notificationSound";
 
@@ -49,7 +51,8 @@ const EmailCard = forwardRef<HTMLDivElement, {
   const [cancelling, setCancelling] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { expired: codeExpired, remainingMs } = useCodeExpiry(
-    email.status === "received" ? email.updatedAt : undefined
+    email.status === "received" ? email.updatedAt : undefined,
+    EMAIL_CODE_EXPIRY_MS
   );
 
   useEffect(() => setEmail(initial), [initial]);
@@ -186,17 +189,24 @@ const EmailCard = forwardRef<HTMLDivElement, {
           ) : (
             (() => {
               const code = extractCode(email.emailText);
+              // emailText is often raw HTML (styled tables, etc.) straight from the
+              // inbox provider — never render it directly, always through stripHtml.
+              const cleanText = stripHtml(email.emailText);
               return (
                 <>
-                  <OtpReadout
-                    resolved={code || email.emailText || ""}
-                    length={6}
-                    className="text-2xl text-emerald-600 dark:text-mint-400"
-                  />
-                  {/* Only show the raw message when it's distinct from what's already
-                      shown above — extractCode() falls back to the full text when it
-                      can't find a code, so re-printing it here would just duplicate it. */}
-                  {code && <p className="mt-2 truncate text-xs text-slate-500">{email.emailText}</p>}
+                  {code ? (
+                    <>
+                      <OtpReadout resolved={code} length={6} className="text-2xl text-emerald-600 dark:text-mint-400" />
+                      {cleanText && cleanText !== code && (
+                        <p className="mt-2 line-clamp-2 text-xs text-slate-500">{cleanText}</p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm text-slate-500">{t("noCodeFound")}</p>
+                      {cleanText && <p className="mt-2 line-clamp-3 text-xs text-slate-500">{cleanText}</p>}
+                    </>
+                  )}
                   <p className="mt-1 font-mono text-[11px] text-amber-600 dark:text-amber-400">
                     {t("expiresIn", { time: formatRemaining(remainingMs) })}
                   </p>
@@ -220,9 +230,9 @@ const EmailCard = forwardRef<HTMLDivElement, {
         >
           {copied === "address" ? t("copied") : t("copyAddress")}
         </MotionButton>
-        {email.status === "received" && !codeExpired && (
+        {email.status === "received" && !codeExpired && extractCode(email.emailText) && (
           <MotionButton
-            onClick={() => copy(extractCode(email.emailText) || email.emailText || "", "code")}
+            onClick={() => copy(extractCode(email.emailText) || "", "code")}
             className="flex-1 rounded-full border border-emerald-200 bg-emerald-50 py-2 text-xs text-emerald-600 hover:bg-emerald-100 transition-colors focus-ring dark:border-mint-500/30 dark:bg-mint-500/10 dark:text-mint-400 dark:hover:bg-mint-500/20"
           >
             {copied === "code" ? t("copied") : t("copyCode")}
