@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import { SUPPORT_EMAIL } from "@/lib/contact";
+import { getSupportEmail } from "@/lib/contact";
 
 function getClient() {
   const apiKey = process.env.RESEND_API_KEY;
@@ -66,7 +66,7 @@ export async function sendContactMessage(params: { name: string; email: string; 
 
   const { error } = await resend.emails.send({
     from,
-    to: SUPPORT_EMAIL,
+    to: await getSupportEmail(),
     replyTo: params.email,
     subject: `Reline contact form: ${params.name}`,
     html: `

@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import LegalLayout, { LegalSection } from "@/components/legal/LegalLayout";
-import { SUPPORT_EMAIL } from "@/lib/contact";
+import { getSupportEmail } from "@/lib/contact";
 
 export const metadata: Metadata = {
   title: "Terms of Service — Reline",
   description: "The terms that govern your use of Reline's virtual number and email verification service.",
 };
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const SUPPORT_EMAIL = await getSupportEmail();
   return (
     <LegalLayout title="Terms of Service" updated="29 July 2026">
       <LegalSection heading="1. About these terms">

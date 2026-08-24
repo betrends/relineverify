@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: "/admin/orders", label: "Numbers", icon: HashIcon },
   { href: "/admin/emails", label: "Emails", icon: MailIcon },
   { href: "/admin/broadcast", label: "Broadcast", icon: MegaphoneIcon },
+  { href: "/admin/settings", label: "Settings", icon: SettingsIcon },
 ];
 
 export default function AdminSidebar() {
@@ -180,6 +181,20 @@ function MegaphoneIcon({ className = "" }) {
         strokeLinejoin="round"
       />
       <path d="M16.8 7.5a3 3 0 0 1 0 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function SettingsIcon({ className = "" }) {
+  return (
+    <svg className={className} viewBox="0 0 20 20" fill="none">
+      <circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M10 3v1.5M10 15.5V17M17 10h-1.5M4.5 10H3M14.8 5.2l-1 1M6.2 13.8l-1 1M14.8 14.8l-1-1M6.2 6.2l-1-1"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }

@@ -1,11 +1,21 @@
 import crypto from "crypto";
 import { prisma } from "./prisma";
+import { getSetting } from "./siteSettings";
 
-export const REFERRAL_PERCENT = 5;
+/** Admin-editable via /admin/settings (defaults to 5%). */
+export async function getReferralPercent(): Promise<number> {
+  const raw = Number(await getSetting("referralPercent"));
+  return Number.isFinite(raw) && raw >= 0 ? raw : 5;
+}
 
 // Rounds down so we never credit a fraction of a Naira.
-export function calculateReferralReward(topupAmount: number): number {
-  return Math.floor((topupAmount * REFERRAL_PERCENT) / 100);
+export function calculateReward(topupAmount: number, percent: number): number {
+  return Math.floor((topupAmount * percent) / 100);
+}
+
+/** Async, DB-backed convenience wrapper around calculateReward + getReferralPercent. */
+export async function calculateReferralReward(topupAmount: number): Promise<number> {
+  return calculateReward(topupAmount, await getReferralPercent());
 }
 
 // No 0/O/1/I/L — avoids codes that are ambiguous when read aloud or typed.

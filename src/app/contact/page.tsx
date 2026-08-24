@@ -4,7 +4,7 @@ import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/motion/Reveal";
 import HoverLift from "@/components/motion/HoverLift";
 import ContactForm from "@/components/ContactForm";
-import { SUPPORT_EMAIL, WHATSAPP_NUMBER } from "@/lib/contact";
+import { getSupportEmail, getWhatsappNumber } from "@/lib/contact";
 
 export const metadata: Metadata = {
   title: "Contact — Reline",
@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 
 const WHATSAPP_MESSAGE = "Hi Reline, I have a question.";
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const [SUPPORT_EMAIL, WHATSAPP_NUMBER] = await Promise.all([getSupportEmail(), getWhatsappNumber()]);
   return (
     <div className="min-h-screen bg-white text-slate-900 dark:bg-ink-950 dark:text-paper-100">
       <SiteNav />
@@ -53,7 +54,7 @@ export default function ContactPage() {
               </span>
               <div className="min-w-0">
                 <p className="font-display font-700 text-slate-900 dark:text-paper-100">WhatsApp</p>
-                <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">+234 707 765 3808</p>
+                <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">+{WHATSAPP_NUMBER}</p>
                 <a
                   href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`}
                   target="_blank"

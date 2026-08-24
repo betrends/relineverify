@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { getServices } from "@/lib/talktiyu";
-import { applyMarkup } from "@/lib/pricing";
+import { getMarkupPercent, calculateMarkedUpPrice } from "@/lib/pricing";
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -16,12 +16,14 @@ export async function GET(req: NextRequest) {
   try {
     const services = await getServices(server, country);
     // Never leak Talktiyu's raw base price to the client — only the
-    // marked-up price we actually charge.
+    // marked-up price we actually charge. One markup lookup for the whole
+    // list rather than one per service.
+    const pct = await getMarkupPercent();
     const priced = services.map((s) => ({
       id: s.id,
       name: s.name,
       available: s.available,
-      price: applyMarkup(s.price),
+      price: calculateMarkedUpPrice(s.price, pct),
     }));
     return NextResponse.json({ services: priced });
   } catch (err: any) {

@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import LegalLayout, { LegalSection } from "@/components/legal/LegalLayout";
-import { SUPPORT_EMAIL } from "@/lib/contact";
+import { getSupportEmail } from "@/lib/contact";
 
 export const metadata: Metadata = {
   title: "Privacy Policy — Reline",
   description: "How Reline collects, uses, and protects your information.",
 };
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const SUPPORT_EMAIL = await getSupportEmail();
   return (
     <LegalLayout title="Privacy Policy" updated="29 July 2026">
       <LegalSection heading="1. What this covers">

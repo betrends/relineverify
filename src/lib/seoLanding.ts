@@ -10,7 +10,7 @@
  * the way a long-lived server could.
  */
 import { AVAILABLE_SERVERS, getCountriesCached, getServicesCached, type TalktiyuCountry, type TalktiyuService } from "./talktiyu";
-import { applyMarkup } from "./pricing";
+import { getMarkupPercent, calculateMarkedUpPrice } from "./pricing";
 import { slugify } from "./slugify";
 
 export { slugify };
@@ -68,7 +68,8 @@ export async function getServiceLanding(slug: string): Promise<ServiceLanding | 
   const match = services.find((s) => slugify(s.name) === slug);
   if (!match) return null;
 
-  return { service: match, priceFrom: applyMarkup(match.price), countryCount: countries.length };
+  const pct = await getMarkupPercent();
+  return { service: match, priceFrom: calculateMarkedUpPrice(match.price, pct), countryCount: countries.length };
 }
 
 export async function getPopularServiceSlugs(limit = 40): Promise<string[]> {
@@ -128,7 +129,8 @@ export async function getCountryLanding(slug: string): Promise<CountryLanding | 
     return ai - bi;
   });
 
-  const popularServices = byPopularity.slice(0, 8).map((s) => ({ ...s, priceCharged: applyMarkup(s.price) }));
+  const pct = await getMarkupPercent();
+  const popularServices = byPopularity.slice(0, 8).map((s) => ({ ...s, priceCharged: calculateMarkedUpPrice(s.price, pct) }));
 
   return { country, popularServices, totalServices: services.length };
 }

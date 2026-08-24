@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
-import { getOrCreateReferralCode, REFERRAL_PERCENT } from "@/lib/referral";
+import { getOrCreateReferralCode, getReferralPercent } from "@/lib/referral";
 
 export async function GET() {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
 
-  const [code, totalReferred, earnings] = await Promise.all([
+  const [code, percent, totalReferred, earnings] = await Promise.all([
     getOrCreateReferralCode(session.userId),
+    getReferralPercent(),
     prisma.user.count({ where: { referredById: session.userId } }),
     prisma.referralEarning.findMany({
       where: { referrerId: session.userId },
@@ -30,7 +31,7 @@ export async function GET() {
 
   return NextResponse.json({
     code,
-    percent: REFERRAL_PERCENT,
+    percent,
     totalReferred,
     totalEarned,
     earnings: earnings.map((e) => {

@@ -9,7 +9,9 @@ import TiltCard from "@/components/motion/TiltCard";
 import CountUpStat from "@/components/motion/CountUpStat";
 import StepBadge from "@/components/motion/StepBadge";
 import CursorSpotlight from "@/components/motion/CursorSpotlight";
+import YoutubeEmbed from "@/components/motion/YoutubeEmbed";
 import { countryCodeToFlag } from "@/lib/countryFlag";
+import { getSetting } from "@/lib/siteSettings";
 
 const STEP_KEYS = ["step1", "step2", "step3"] as const;
 const TRUST_STATS = [
@@ -112,6 +114,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <TutorialVideoSection />
+
       <section className="mx-auto max-w-6xl px-6 py-16">
         <Reveal>
           <div className="grid divide-y divide-slate-200/70 rounded-3xl border border-violet-100 bg-white/70 shadow-[0_8px_32px_-12px_rgba(124,92,252,0.15)] backdrop-blur-xl dark:divide-white/10 dark:border-white/10 dark:bg-ink-900/40 sm:grid-cols-4 sm:divide-x sm:divide-y-0">
@@ -164,6 +168,32 @@ export default function LandingPage() {
 
       <SiteFooter />
     </div>
+  );
+}
+
+// A separate async component (rather than making LandingPage itself
+// async) — mixing next-intl's client-hook-shaped useTranslations() with
+// await in the same Server Component broke React's RSC rendering
+// ("Expected a suspended thenable", surfaced only in a real production
+// build, not `next dev`). An async child component sidesteps it cleanly.
+async function TutorialVideoSection() {
+  const tutorialVideoUrl = await getSetting("tutorialVideoUrl");
+  if (!tutorialVideoUrl) return null;
+
+  return (
+    <section className="mx-auto max-w-4xl px-6 py-16">
+      <Reveal>
+        <h2 className="text-center font-display text-3xl font-700 tracking-tight text-slate-900 dark:text-paper-100">
+          Watch how it works
+        </h2>
+        <p className="mt-2 text-center text-sm text-slate-500 dark:text-slate-400">
+          A quick walkthrough of getting a virtual number or email on Reline.
+        </p>
+        <div className="mt-8">
+          <YoutubeEmbed url={tutorialVideoUrl} title="How to get virtual numbers and emails on Reline" />
+        </div>
+      </Reveal>
+    </section>
   );
 }
 

@@ -1,11 +1,12 @@
 import Reveal from "@/components/motion/Reveal";
 import HoverLift from "@/components/motion/HoverLift";
 import FaqAccordion from "@/components/dashboard/FaqAccordion";
-import { SUPPORT_EMAIL, WHATSAPP_NUMBER } from "@/lib/contact";
+import { getSupportEmail, getWhatsappNumber } from "@/lib/contact";
 
 const WHATSAPP_MESSAGE = "Hi Reline support, I need help with my account.";
 
-export default function SupportPage() {
+export default async function SupportPage() {
+  const [SUPPORT_EMAIL, WHATSAPP_NUMBER] = await Promise.all([getSupportEmail(), getWhatsappNumber()]);
   return (
     <div>
       <Reveal>
@@ -44,7 +45,7 @@ export default function SupportPage() {
             </span>
             <div className="min-w-0">
               <p className="font-display font-700 text-slate-900 dark:text-paper-100">WhatsApp</p>
-              <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">+234 707 765 3808</p>
+              <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">+{WHATSAPP_NUMBER}</p>
               <a
                 href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`}
                 target="_blank"

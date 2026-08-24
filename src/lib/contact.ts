@@ -1,2 +1,11 @@
-export const SUPPORT_EMAIL = "mgbedikekosi34@gmail.com";
-export const WHATSAPP_NUMBER = "2347077653808";
+import { getSetting } from "./siteSettings";
+
+/** Admin-editable via /admin/settings. */
+export async function getSupportEmail(): Promise<string> {
+  return getSetting("supportEmail");
+}
+
+/** Admin-editable via /admin/settings. Digits only, no "+". */
+export async function getWhatsappNumber(): Promise<string> {
+  return getSetting("whatsappNumber");
+}

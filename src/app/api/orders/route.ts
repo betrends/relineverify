@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     if (!match) {
       return NextResponse.json({ error: "Service unavailable" }, { status: 404 });
     }
-    const charged = applyMarkup(match.price);
+    const charged = await applyMarkup(match.price);
 
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: session.userId },

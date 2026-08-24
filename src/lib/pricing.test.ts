@@ -1,57 +1,43 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { applyMarkup, getMarkupPercent } from "./pricing";
+import { describe, it, expect } from "vitest";
+import { parseMarkupPercent, calculateMarkedUpPrice } from "./pricing";
 
-describe("pricing", () => {
-  const originalEnv = process.env.MARKUP_PERCENT;
-
-  afterEach(() => {
-    process.env.MARKUP_PERCENT = originalEnv;
+// getMarkupPercent/applyMarkup are thin async wrappers that read the
+// markup from the database (see siteSettings.ts, admin-editable via
+// /admin/settings) — not unit-tested directly to avoid hitting a real
+// database in tests. Their pure logic lives here and is fully covered.
+describe("parseMarkupPercent", () => {
+  it("defaults to 30 when unset", () => {
+    expect(parseMarkupPercent(undefined)).toBe(30);
   });
 
-  describe("getMarkupPercent", () => {
-    it("defaults to 30 when MARKUP_PERCENT is unset", () => {
-      delete process.env.MARKUP_PERCENT;
-      expect(getMarkupPercent()).toBe(30);
-    });
-
-    it("reads a configured percentage", () => {
-      process.env.MARKUP_PERCENT = "25";
-      expect(getMarkupPercent()).toBe(25);
-    });
-
-    it("falls back to 30 for a negative value", () => {
-      process.env.MARKUP_PERCENT = "-10";
-      expect(getMarkupPercent()).toBe(30);
-    });
-
-    it("falls back to 30 for a non-numeric value", () => {
-      process.env.MARKUP_PERCENT = "not-a-number";
-      expect(getMarkupPercent()).toBe(30);
-    });
-
-    it("allows a zero markup", () => {
-      process.env.MARKUP_PERCENT = "0";
-      expect(getMarkupPercent()).toBe(0);
-    });
+  it("reads a configured percentage", () => {
+    expect(parseMarkupPercent("25")).toBe(25);
   });
 
-  describe("applyMarkup", () => {
-    beforeEach(() => {
-      process.env.MARKUP_PERCENT = "30";
-    });
+  it("falls back to 30 for a negative value", () => {
+    expect(parseMarkupPercent("-10")).toBe(30);
+  });
 
-    it("applies the configured percentage on top of the base cost", () => {
-      expect(applyMarkup(100)).toBe(130);
-    });
+  it("falls back to 30 for a non-numeric value", () => {
+    expect(parseMarkupPercent("not-a-number")).toBe(30);
+  });
 
-    it("rounds up to the nearest whole Naira", () => {
-      // 133 * 1.3 = 172.9 -> should round up to 173
-      expect(applyMarkup(133)).toBe(173);
-    });
+  it("allows a zero markup", () => {
+    expect(parseMarkupPercent("0")).toBe(0);
+  });
+});
 
-    it("never charges less than the base cost when markup is 0", () => {
-      process.env.MARKUP_PERCENT = "0";
-      expect(applyMarkup(100)).toBe(100);
-    });
+describe("calculateMarkedUpPrice", () => {
+  it("applies the configured percentage on top of the base cost", () => {
+    expect(calculateMarkedUpPrice(100, 30)).toBe(130);
+  });
+
+  it("rounds up to the nearest whole Naira", () => {
+    // 133 * 1.3 = 172.9 -> should round up to 173
+    expect(calculateMarkedUpPrice(133, 30)).toBe(173);
+  });
+
+  it("never charges less than the base cost when markup is 0", () => {
+    expect(calculateMarkedUpPrice(100, 0)).toBe(100);
   });
 });

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { verifyTransaction } from "@/lib/korapay";
-import { calculateReferralReward } from "@/lib/referral";
+import { calculateReward, getReferralPercent } from "@/lib/referral";
 
 /**
  * Korapay calls this endpoint after a payment event. The signature is an
@@ -72,6 +72,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
+  // Resolved outside the transaction — it's just an input value, not
+  // something that needs read-consistency with the writes below, and
+  // querying through the outer (non-transactional) prisma client from
+  // inside a $transaction callback risks connection-pool issues.
+  const referralPercent = await getReferralPercent();
+
   await prisma.$transaction(async (tx) => {
     // Korapay's own docs warn webhook deliveries can be retried/duplicated —
     // guard the transition so only the delivery that actually flips this
@@ -93,7 +99,7 @@ export async function POST(req: NextRequest) {
     // whoever referred them, for as long as the referral relationship exists.
     const referrerId = transaction.type === "topup" ? transaction.user.referredById : null;
     if (referrerId) {
-      const rewardAmount = calculateReferralReward(transaction.amount);
+      const rewardAmount = calculateReward(transaction.amount, referralPercent);
       if (rewardAmount > 0) {
         await tx.user.update({
           where: { id: referrerId },

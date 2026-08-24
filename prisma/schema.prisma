@@ -99,6 +99,15 @@ model GeneratedEmail {
   @@index([userId])
 }
 
+// Generic key/value store for small pieces of site-wide content an admin
+// edits occasionally (e.g. the homepage tutorial video link) — not worth a
+// dedicated table each, and easy to extend with more keys later.
+model SiteSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
 model Order {
   id              String   @id @default(cuid())
   userId          String
